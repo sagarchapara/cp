@@ -20,7 +20,17 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define pb push_back
 
 void solve() {
-    
+    int n;
+    cin >> n;
+
+    for(int i=1; i<=n ; i++){
+        for(int j =1 ;j<=n ;j++){
+            int add = (i+j-1) > n ? (i+j-1-n) : (i+j-1); 
+            int curr = ((j-1)*n)+ add;
+            cout << curr << " ";
+        }
+        cout << endl;
+    }
 }
 
 int32_t main() {
@@ -29,7 +39,6 @@ int32_t main() {
     int tc = 1;
     // cin >> tc;
     for (int t = 1; t <= tc; t++) {
-        // cout << "Case #" << t << ": ";
         solve();
     }
 }
