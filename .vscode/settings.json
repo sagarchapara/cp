@@ -7,6 +7,9 @@
         "span": "cpp",
         "stacktrace": "cpp",
         "regex": "cpp",
-        "iosfwd": "cpp"
+        "iosfwd": "cpp",
+        "iostream": "cpp",
+        "type_traits": "cpp",
+        "ostream": "cpp"
     }
 }
