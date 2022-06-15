@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // cmd /c '.\out.exe < input.txt'
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -41,9 +41,70 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 
 #define int long long
+#define pi pair<int,int>
+#define pii pair<pair<int,int>,int>
 
 void solve() {
+    int n , m, k;
+    cin >> n >> m >> k ;
+
+    vector<int> arr(n);
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
     
+    vector<pii> op(m);
+    for(int i=0;i<m ;i++){
+        int l, r, d;
+        cin >> l >> r >> d;
+        op[i] = make_pair(make_pair(l-1,r-1), d);
+    }
+
+    vector<pi> quers(k);
+    for(int i=0;i<k ;i++){
+        int x,y;
+        cin >> x >> y;
+        quers[i] = make_pair(x-1,y-1);
+    }
+
+    vector<int> sum(m, 0);
+
+    for(int i=0;i< k ;i++){
+        sum[quers[i].first]++;
+        if(quers[i].second +1 < m){
+            sum[quers[i].second+1]--;
+        }
+    }
+
+    for(int i=1;i<m;i++){
+        sum[i]+=sum[i-1];
+    }
+
+    vector<int> cnt(n ,0);
+    for(int i=0;i<m;i++){
+        cnt[op[i].first.first]+= (sum[i]*op[i].second);
+
+        if(op[i].first.second+1 < n){
+            cnt[op[i].first.second+1]-= (sum[i]*op[i].second);
+        } 
+    }
+
+    for(int i=1;i<n;i++){
+        cnt[i]+=cnt[i-1];
+    }
+
+
+
+    dbg(arr);
+    dbg(op);
+    dbg(quers);
+    dbg(cnt);
+    dbg(sum);
+
+
+    for(int i=0;i< n;i++){
+        cout << arr[i]+cnt[i] << " ";
+    }
 }
 
 int32_t main() {

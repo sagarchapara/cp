@@ -41,9 +41,56 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 
 #define int long long
+#define all(x) (x).begin(), (x).end()
+
+int cnt;
+
+void dfs(int curr, string& f, int count, int& ans, int& total){
+    int n = f.size();
+    if(curr == n){
+        if(cnt == count){
+            ++ans;
+        }
+        ++total;
+        return;
+    }
+    else{
+        if(f[curr]== '?'){
+            dfs(curr+1, f, count+1, ans, total);
+            dfs(curr+1, f, count-1, ans, total);
+        }
+        else if(f[curr] == '+'){
+            dfs(curr+1, f, count+1, ans, total);
+        }
+        else{
+            dfs(curr+1, f, count-1, ans, total);
+        }
+    }
+}
 
 void solve() {
-    
+    string a, f ;
+    read(a, f); //dbg(a, f);
+
+    cnt =0;
+    int n = a.size();
+    for(auto itr = a.begin(); itr!= a.end();++itr){
+        if (*itr == '+'){
+            ++cnt;
+        }
+        else{
+            --cnt;
+        }
+    }
+
+    int ans =0;
+    int total =0;
+    dfs(0, f, 0, ans, total);
+
+    //dbg(ans, total);
+
+    double prob = (ans*1.0)/(total*1.0);
+    cout << prob;
 }
 
 int32_t main() {
@@ -51,6 +98,7 @@ int32_t main() {
     cin.tie(0); cout.tie(0);
     int tc = 1;
     // cin >> tc;
+    cout.precision(12);
     for (int t = 1; t <= tc; t++) {
         // cout << "Case #" << t << ": ";
         solve();

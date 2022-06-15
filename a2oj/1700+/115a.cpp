@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // cmd /c '.\out.exe < input.txt'
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -42,7 +42,46 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 
 #define int long long
 
+void dfs(int curr, vector<vector<int>>& emp, vector<int>& dep, int& ans){
+    int curr_depth = 1;
+    for(int c: emp[curr]){
+        if(dep[c]==-1){
+            dfs(c, emp, dep, ans);
+        }
+        curr_depth = max(1+ dep[c], curr_depth);
+    }
+    dep[curr] = curr_depth;
+
+    ans = max( ans, curr_depth);
+}
+
 void solve() {
+    int n;
+    cin >> n;
+    vector<vector<int>> emp(n);
+
+    vector<int> dep(n, -1);
+
+    for(int i=0;i<n;i++){
+        int man;
+        cin >> man;
+        if(man!=-1){
+            emp[man-1].push_back(i);
+        }    
+    }
+
+    dbg(emp);
+
+     int ans =0;
+    for(int i=0;i<n;i++){
+        if(dep[i]==-1){
+            dfs(i, emp, dep, ans);
+        }
+    }
+
+    dbg(dep);
+
+    cout << ans << endl;
     
 }
 
