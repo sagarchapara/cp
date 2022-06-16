@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -42,8 +42,52 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 
 #define int long long
 
+void dfs(int curr, int par, vector<vector<pair<int,int>>>& edges, vector<int>& arr, vector<int>& count){
+    int ans =0;
+    bool shouldPush = false;
+    for(pair p: edges[curr]){
+        int to = p.first;
+        int w = p.second;
+        if(to != par){
+            dfs(to, curr, edges, arr, count);
+            if(arr[to]>0){
+                ans+=arr[to];
+            }
+            else if(w == 2){
+                ans+=1;
+                count.push_back(to+1);
+            }
+        }
+    }
+    arr[curr] = ans;
+}
+
 void solve() {
-    
+    int n;
+    cin >> n;
+
+    vector<vector<pair<int,int>>> edges(n);
+
+    for(int i=0;i<n-1;i++){
+        int to, fro, w;
+        cin >> to >> fro >> w;
+
+        edges[to-1].push_back(make_pair(fro-1, w));
+        edges[fro-1].push_back(make_pair(to-1, w));
+    }
+
+    dbg(edges);
+
+   
+
+    vector<int> arr(n,0);
+    vector<int> points;
+
+    dfs(0, -1, edges, arr, points);
+
+    cout << arr[0] << endl;
+
+    cout << points;
 }
 
 int32_t main() {

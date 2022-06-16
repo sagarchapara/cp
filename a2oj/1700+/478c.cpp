@@ -1,5 +1,5 @@
 // g++ -o out <filename>.cpp
-// .\out.exe
+// cmd /c '.\out.exe < input.txt'
 
 #define SAGAR
 
@@ -43,21 +43,30 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define int long long
 
 void solve() {
-    
+    vector<int> arr(3);
+    cin >> arr[0] >> arr[1] >> arr[2];
+
+    sort(arr.begin(), arr.end());
+
+    int ans =0;
+
+    if(arr[2] >= 2*(arr[0]+ arr[1])){
+        ans = arr[0]+ arr[1];
+    }
+    else{
+        ans = (arr[2]+arr[0]+arr[1])/3;
+    }
+
+    cout << ans;
 }
 
 int32_t main() {
     ios_base::sync_with_stdio(0);
     cin.tie(0); cout.tie(0);
-
-    #ifdef SAGAR
-        freopen("input.txt", "r", stdin);
-        // freopen("output.txt", "w", stdout);
-    #endif
-
     int tc = 1;
     // cin >> tc;
     for (int t = 1; t <= tc; t++) {
+        // cout << "Case #" << t << ": ";
         solve();
     }
 }
