@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -44,10 +44,76 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define all(x) (x).begin(), (x).end()
 
 void solve() {
+    string s;
+    cin >> s;
+
+    int cntl =0, cntr =0, cnth =0, last_pos;
+
+    int i =0;
+    for(char c:s){
+        if(c == '('){   
+            cntl++;
+        }
+        else if(c == ')'){
+            cntr++;
+        }
+        else{
+            cnth++;
+            last_pos = i;
+        }
+        i++;
+    }
+
+    if(cntl <= cntr){
+        cout << -1;
+        return;
+    }
+
+    if(cntl - cntr < cnth){
+        cout << -1;
+        return;
+    }
+
+    int n = s.size();
+    int count  =0;
+    int num = cntl - cntr;
+
+    for(int i=0;i<n;i++){
+        if(s[i] == '('){   
+            count++;
+        }
+        else if(s[i] == ')'){
+            count--;
+        }
+        else{
+            if(i!=last_pos){
+                count--;
+            }
+            else{
+                count -= (cntl-cntr-cnth+1);
+            }
+        }
+
+        if(count < 0){
+            cout << -1;
+            return;
+        }
+    }
+
     
+
+    for(int i=0;i<cnth;i++){
+        if(i==cnth-1){
+            cout << (num-cnth+1) << endl;
+        }
+        else{
+            cout << 1 << endl;
+        }
+    }
 }
 
 int32_t main() {
+
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);

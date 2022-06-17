@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -44,10 +44,40 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define all(x) (x).begin(), (x).end()
 
 void solve() {
-    
+    int n, q;
+    cin >> n >> q;
+    vector<int> arr(n);
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    vector<int> sum(n,0);
+    for(int i=0;i<q;i++){
+        int l, r;
+        cin >> l >> r;
+        sum[l-1]++;
+        if(r<n){
+            sum[r]--;
+        }
+    }
+
+    for(int i=1;i<n;i++){
+        sum[i]+=sum[i-1];
+    }
+
+    sort(all(arr));
+    sort(all(sum));
+
+    int ans =0;
+    for(int i=0;i<n;i++){
+        ans+= (sum[i]*arr[i]);
+    }
+
+    cout << ans;
 }
 
 int32_t main() {
+
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);

@@ -42,12 +42,108 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 
 #define int long long
 #define all(x) (x).begin(), (x).end()
+#define pi pair<int,int>
+
+// bool cmp(pi a, pi b) { return a.second < b.second; }
+
+pair<bool,int> isPossible(int k, int n, int m, int a, vector<int>& money, vector<int>& bikes){
+    
+    dbg(k);
+   
+    int rem = a;
+
+    pair<bool, int> ans(false,0);
+
+    int sum =0;
+
+    for(int i=n-k;i<n;i++){
+        dbg(rem);
+        dbg(bikes[i-n+k]);
+        dbg(money[i]);
+        if(rem<0){
+            return ans;
+        }
+        else if(rem + money[i] >= bikes[i-n+k]){
+            rem-= max(0ll, bikes[i-n+k]-money[i]);
+            
+            sum+= min(money[i],bikes[i-n+k] );
+        }
+        else{
+            return ans;
+        }
+        dbg(rem);
+    }
+
+    ans.first = true;
+    ans.second = sum;
+
+    return ans;
+}
 
 void solve() {
+    int n , m ,a;
+    cin >> n >> m >> a;
+
+    dbg(n, m ,a);
+
+    vector<int> money(n);
+    for(int i=0;i<n;i++){
+        int b;
+        cin >> money[i];
+    }
+
+    sort(all(money));
+
+    dbg(money);
+
+    vector<int> bikes(m);
+    for(int i=0;i<m;i++){
+        cin >> bikes[i];
+    }
+
+    sort(all(bikes));
+
+    dbg(bikes);
     
+    int start =1 , end = min(m,n);
+
+    while(end-start > 1){
+        int mid = (start+end)/2;
+        
+        if(isPossible(mid,n,m,a,money,bikes).first){
+            start = mid;
+        }
+        else{
+            end = mid-1;
+        }
+    }
+
+    bool isTrue = false;
+
+    int max_ans, min_sum;
+
+    for(int i=end; i>=start;i--){
+        auto p= isPossible(i,n,m,a,money,bikes);
+        if(p.first){
+            isTrue = true;
+            max_ans = i;
+            min_sum = p.second;
+            break;
+        }
+    }
+
+    if(!isTrue){
+        cout << 0 << " " << 0;
+    }
+
+
+
+    cout << max_ans << " " << min_sum ;
+
 }
 
 int32_t main() {
+
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);
