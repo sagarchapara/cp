@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -29,12 +29,84 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define vi vector<int>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
-//don't use expressions
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
+vector<int> nextGreaterElem(vector<int>& v){
+    stack<int> s;
+
+    int n = v.size();
+
+    vector<int> ans(n, -1);
+    s.push(0);
+
+    for(int i=1;i<n;i++){
+        while(!s.empty() && v[i] > v[s.top()]){
+            ans[s.top()] = i;
+            s.pop();
+        }
+        s.push(i);
+    }
+
+    return ans;
+}
+
 void solve() {
+    int n; cin >> n;
+    vi arr(n);
+
+    rep(i,0,n){
+        cin >> arr[i];
+    }
+
+    vector<vi> bits(20, vi(n));
     
+    rep(i,0,20){
+        rep(j,0,n){
+            if(arr[j]& (1<<i)){
+                bits[i][j] = 1;
+            }
+        }
+    }
+
+    vector<vi> nge(20, vi(n));
+
+    rep(i,0,20){
+        nge[i] = nextGreaterElem(bits[i]);
+    }
+
+    dbg(bits);
+    dbg(nge);
+
+    set<int> unique_num;
+
+    rep(i,0,n){
+        map<int,int> nbits;
+        rep(j,0,20){
+            if(nge[j][i]!=-1){
+                if(!nbits.count(nge[j][i])){
+                    nbits[nge[j][i]] = (1<<j);
+                }
+                else{
+                    nbits[nge[j][i]]|= (1<<j);
+                }
+            }
+        }
+
+        dbg(i);
+        dbg(nbits);
+
+        int val = arr[i]; unique_num.insert(val);
+        for(auto [key,nval]: nbits){
+            val|=nval; unique_num.insert(val);
+        }
+    }
+
+    dbg(unique_num);
+
+    cout << (unique_num.size());
+
+
 }
 
 int32_t main() {

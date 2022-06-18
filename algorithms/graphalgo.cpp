@@ -7,6 +7,10 @@ using namespace std;
 ================================================================
 **/
 
+vector<vector<int>> adj, adj_rev;
+vector<bool> used;
+vector<int> order, component;
+
 void dfs1(int v, vector<vector<int>>& adj, vector<bool>& used, vector<int>& order) {
     used[v] = true;
     for (int u : adj[v]){
@@ -31,7 +35,9 @@ void dfs2(int v, vector<vector<int>>& adj_rev, vector<bool>& used, vector<int>& 
 // int main() {
 //     int n;
 //     // ... read n ...
-
+//      
+//     adj.resize(n); adj_rev.resize(n);   
+//
 //     for (;;) {
 //         int a, b;
 //         // ... read next directed edge (a,b) ...
