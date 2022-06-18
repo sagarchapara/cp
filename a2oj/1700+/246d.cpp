@@ -41,111 +41,84 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 
 #define int long long
-#define all(x) (x).begin(), (x).end()
+#define F first
+#define S second
 #define pi pair<int,int>
+#define vi vector<int>
+#define all(x) (x).begin(), (x).end()
+#define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
+#define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
+#define sz(x) (int)(x).size()
 
-// bool cmp(pi a, pi b) { return a.second < b.second; }
-
-pair<bool,int> isPossible(int k, int n, int m, int a, vector<int>& money, vector<int>& bikes){
-    
-    dbg(k);
-   
-    int rem = a;
-
-    pair<bool, int> ans(false,0);
-
-    int sum =0;
-
-    for(int i=n-k;i<n;i++){
-        dbg(rem);
-        dbg(bikes[i-n+k]);
-        dbg(money[i]);
-        if(rem<0){
-            return ans;
+void dfs(int curr, int par, vi& arr, vector<vi>& edges, map<int,set<int>>& cmap, vector<bool>& visited){
+    dbg(curr);
+    visited[curr] = true;
+    for(int adj: edges[curr]){
+        if(arr[curr]!= arr[adj]){
+            cmap[arr[curr]].insert(arr[adj]);
+            cmap[arr[adj]].insert(arr[curr]);
+            dbg(adj);
+            dbg(cmap[arr[curr]]);
+            dbg(cmap[arr[adj]]);
         }
-        else if(rem + money[i] >= bikes[i-n+k]){
-            rem-= max(0ll, bikes[i-n+k]-money[i]);
+        if(!visited[adj]){
+            dfs(adj, curr, arr, edges, cmap, visited);
         }
-        else{
-            return ans;
-        }
-        dbg(rem);
     }
-
-    for(int i=0;i<k;i++){
-        sum+=bikes[i];
-    }
-
-    sum-= min(sum, a);
-
-    ans.first = true;
-    ans.second = sum;
-
-    return ans;
 }
 
+
+
+
 void solve() {
-    int n , m ,a;
-    cin >> n >> m >> a;
+    int n, m;
+    cin >> n >> m;
+    vi arr(n);
+    map<int,set<int>> cmap;
 
-    dbg(n, m ,a);
-
-    vector<int> money(n);
-    for(int i=0;i<n;i++){
-        int b;
-        cin >> money[i];
+    int min_color = 1e10;
+    rep(i,0,n){
+        cin >> arr[i];
+        min_color = min(arr[i], min_color);
     }
 
-    sort(all(money));
+    dbg(arr); 
 
-    dbg(money);
+    vector<vi> edges(n);
 
-    vector<int> bikes(m);
-    for(int i=0;i<m;i++){
-        cin >> bikes[i];
+    rep(i,0,m){
+        int x, y;
+        cin >> x >> y;
+        edges[x-1].push_back(y-1);
+        edges[y-1].push_back(x-1);
     }
 
-    sort(all(bikes));
+    dbg(edges);
 
-    dbg(bikes);
-    
-    int start =1 , end = min(m,n);
+    vector<bool> visited(n, false);
 
-    while(end-start > 1){
-        int mid = (start+end)/2;
-        
-        if(isPossible(mid,n,m,a,money,bikes).first){
-            start = mid;
-        }
-        else{
-            end = mid-1;
+    rep(i,0,n){
+        if(!visited[i]){
+            dfs(i,-1,arr,edges,cmap, visited);
         }
     }
 
-    bool isTrue = false;
+    int color = min_color;
+    int max = 0;
 
-    int max_ans, min_sum;
-
-    for(int i=end; i>=start;i--){
-        auto p= isPossible(i,n,m,a,money,bikes);
-        if(p.first){
-            isTrue = true;
-            max_ans = i;
-            min_sum = p.second;
-            break;
+    for(auto [key, val]: cmap){
+        dbg(key);
+        dbg(val);
+        if(sz(val)> max){
+            color = key;
+            max = sz(val);
         }
     }
 
-    if(!isTrue){
-        cout << 0 << " " << 0;
-    }
-    else{
-        cout << max_ans << " " << min_sum ;
-    }
+    cout << color;
 }
 
 int32_t main() {
-
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);

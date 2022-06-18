@@ -31,7 +31,7 @@ template<typename... x>void read(x&... a){((read(a)), ...);}
  */
 
 template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os <<  p.first << " " << p.second ;}
-template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { for (const T &x : v) os << x << " "; return os;}
+template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { for (const T &x : v) os << x ; return os;}
 void dbg_out() { cerr << ""; }
 template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << H << endl; dbg_out(T...); }
 #ifdef SAGAR
@@ -46,13 +46,95 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define pi pair<int,int>
 #define vi vector<int>
 #define all(x) (x).begin(), (x).end()
+#define rall(x) (x).rbegin(), (x).rend()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
-//don't use expressions
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
 void solve() {
+    int n;
+    cin >> n;
+    vi arr(9);
+    rep(i, 0, 9){
+        cin >> arr[i];
+    }
+    map<int, int> cost;
     
+    rep(i, 0, 9){
+        cost[arr[i]] = (i+1);
+    }
+
+    int min_cost = cost.begin()->first;
+
+    int num = n/(cost.begin()->first);
+
+    if(num <=0){
+        cout << -1;
+        return;
+    }
+
+    int rem = n - (num)*min_cost ;
+
+    vi ans;
+
+    while( rem > 0){
+
+        dbg(rem);
+
+        int next = cost.begin()->second;
+
+        int nxtCost = 0;
+
+        bool isFound = false;
+
+        for (auto const& [key, val] : cost)
+        {
+            if(key <= (rem + min_cost)){
+                if(val > next){
+                    next = val;
+                    nxtCost = key;
+                    isFound = true;
+                }
+            }
+        }
+
+        if(!isFound){
+            break;
+        }
+
+        rem-=nxtCost;
+        rem+=min_cost;
+        ans.push_back(next);
+
+        dbg(rem);
+    }
+    
+    dbg(ans);
+
+    dbg(num-sz(ans));
+
+    // int k = num - sz(ans);
+    // for(int i=0;i<k; i++){
+    //     ans.push_back(cost.begin()->second);
+    // }
+
+    int k = num - sz(ans);
+    rep(i, k, 0){
+        ans.push_back(cost.begin()->second);
+        dbg("1sas");  
+        dbg(i); 
+    }
+
+    dbg(ans);
+
+    sort(rall(ans));
+
+    
+
+    
+
+    cout << ans;
+
 }
 
 int32_t main() {

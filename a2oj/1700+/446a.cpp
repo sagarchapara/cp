@@ -41,111 +41,62 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 
 #define int long long
-#define all(x) (x).begin(), (x).end()
+#define F first
+#define S second
 #define pi pair<int,int>
-
-// bool cmp(pi a, pi b) { return a.second < b.second; }
-
-pair<bool,int> isPossible(int k, int n, int m, int a, vector<int>& money, vector<int>& bikes){
-    
-    dbg(k);
-   
-    int rem = a;
-
-    pair<bool, int> ans(false,0);
-
-    int sum =0;
-
-    for(int i=n-k;i<n;i++){
-        dbg(rem);
-        dbg(bikes[i-n+k]);
-        dbg(money[i]);
-        if(rem<0){
-            return ans;
-        }
-        else if(rem + money[i] >= bikes[i-n+k]){
-            rem-= max(0ll, bikes[i-n+k]-money[i]);
-        }
-        else{
-            return ans;
-        }
-        dbg(rem);
-    }
-
-    for(int i=0;i<k;i++){
-        sum+=bikes[i];
-    }
-
-    sum-= min(sum, a);
-
-    ans.first = true;
-    ans.second = sum;
-
-    return ans;
-}
+#define vi vector<int>
+#define all(x) (x).begin(), (x).end()
+#define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
+#define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
+#define sz(x) (int)(x).size()
 
 void solve() {
-    int n , m ,a;
-    cin >> n >> m >> a;
-
-    dbg(n, m ,a);
-
-    vector<int> money(n);
-    for(int i=0;i<n;i++){
-        int b;
-        cin >> money[i];
+    int n;
+    cin >> n;
+    vi arr(n);
+    rep(i, 0 ,n){
+        cin >> arr[i]; 
     }
-
-    sort(all(money));
-
-    dbg(money);
-
-    vector<int> bikes(m);
-    for(int i=0;i<m;i++){
-        cin >> bikes[i];
-    }
-
-    sort(all(bikes));
-
-    dbg(bikes);
-    
-    int start =1 , end = min(m,n);
-
-    while(end-start > 1){
-        int mid = (start+end)/2;
-        
-        if(isPossible(mid,n,m,a,money,bikes).first){
-            start = mid;
-        }
-        else{
-            end = mid-1;
+    vi pref(n,1), suff(n,1);
+    rep(i, 1, n){
+        if(arr[i]>arr[i-1]){
+            pref[i]+=pref[i-1];
         }
     }
 
-    bool isTrue = false;
-
-    int max_ans, min_sum;
-
-    for(int i=end; i>=start;i--){
-        auto p= isPossible(i,n,m,a,money,bikes);
-        if(p.first){
-            isTrue = true;
-            max_ans = i;
-            min_sum = p.second;
-            break;
+    rep(i, n-1 , 0){
+        if(arr[i] < arr[i+1]){
+            suff[i]+=suff[i+1];
         }
     }
 
-    if(!isTrue){
-        cout << 0 << " " << 0;
+    dbg(arr);  dbg(pref); dbg(suff);
+
+    int ans =1;
+    rep(i,0,n){ 
+        ans = max(pref[i], ans);
+        ans = max(ans, suff[i]);
+
+        if(i-1 >=0){
+            ans = max(pref[i-1]+1 ,ans);
+        }
+        if(i+1 < n){
+            ans = max(suff[i+1]+1, ans);
+        }
+
+        if(i+1<n && i-1>=0){
+            if(arr[i+1] - arr[i-1] > 1){
+                ans = max( ans, suff[i+1]+ pref[i-1]+1);
+            }
+        }
     }
-    else{
-        cout << max_ans << " " << min_sum ;
-    }
+
+    cout << ans;
+
+
 }
 
 int32_t main() {
-
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);
