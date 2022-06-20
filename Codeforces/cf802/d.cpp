@@ -1,10 +1,16 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
+
+/*
+ *==========================================
+ * Output and Debug
+ *==========================================
+ */
 
 template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os <<  p.first << " " << p.second ;}
 template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { for (const T &x : v) os << x << " "; return os;}
@@ -23,12 +29,40 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define vi vector<int>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
-//don't use expressions
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
+
 void solve() {
-    
+    int n; cin >> n;
+    vi arr(n); for(int &x: arr) cin >>x;
+
+    vi min_time(n); int sum =0;
+    rep(i,0,n){
+        sum+=arr[i];
+        min_time[i] = ((sum+i)/(i+1));
+        if(i>0){
+            min_time[i] = max(min_time[i-1], min_time[i]);
+        }
+    }
+
+    int q; cin >> q;
+    rep(i,0,q){
+        int time; cin >> time;
+        int num = ((sum+time-1)/time);
+
+        if(num>n){
+            cout << -1 << endl;
+            continue;
+        }
+
+        if(time < min_time[num-1]){
+            cout << -1 << endl;
+            continue;
+        }
+
+        cout << num << endl;   
+    }
 }
 
 int32_t main() {
