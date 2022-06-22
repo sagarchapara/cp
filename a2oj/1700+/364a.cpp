@@ -26,40 +26,54 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
+
+
 void solve() {
-    int n ; cin >> n;
-    vector<vi> arr(n, vi(3));
-    rep(j,0,3)
-        rep(i,0,n) cin >> arr[i][j];
-    int dp[n][2][2];
+    int total ; cin >> total;
+    string s; cin >> s; int n = sz(s);
+    
+    int uq_sum[(n*9)+5] ={};
+
+    int ans =0, tc=0;
 
     rep(i,0,n){
-        dp[i][0][0] = arr[i][0];
-        dp[i][0][1] = arr[i][1];
-        dp[i][1][0] = arr[i][1];
-        dp[i][1][1] = arr[i][2];
-
-        // cout << "( " << i <<" , " << i << " ) " << dp[i][i][0][0] << " " << dp[i][i][0][1] << " " << dp[i][i][1][0] << " " << dp[i][i][1][1]  << endl;
-    }
-
-    rep(i,0,n){
-        int new_dp[n][2][2];
-        for(int l = 1; i+l < n;l++){
-            new_dp[i][1][1] = max(dp[i][1][0]+ arr[i+l][2],dp[i][1][1] + arr[i+l][1]);
-            new_dp[i][1][0] = max(dp[i][1][0]+ arr[i+l][1], dp[i][1][1] + arr[i+l][0]);
-            new_dp[i][0][1] = max(dp[i][0][1]+ arr[i+l][1], dp[i][0][0] + arr[i+l][2]);
-            new_dp[i][0][0] = max(dp[i][0][0]+ arr[i+l][1], dp[i][0][1] + arr[i+l][0]);
-
-            dp[i][0][0] = new_dp[i][0][0];
-            dp[i][0][1] = new_dp[i][0][1];
-            dp[i][1][0] = new_dp[i][1][0];
-            dp[i][1][1] = new_dp[i][1][1];
-            
-            // cout << "( " << i <<" , " << (i+l) << " ) " << dp[i][i+l][0][0] << " " << dp[i][i+l][0][1] << " " << dp[i][i+l][1][0] << " " << dp[i][i+l][1][1] << endl;
+        int sum = (s[i]-'0');
+        rep(j,i+1,n+1){
+            uq_sum[sum]++;
+            if(j<n) {
+                sum+= (s[j]-'0');
+            }
         }
     }
 
-    cout << dp[0][0][0] << endl;
+
+    
+    for(int i=0;i<((9*n)+5);i++){
+        int sum1 = i; int val1 = uq_sum[i];
+        dbg(sum1); dbg(val1);
+        if(total == 0 && sum1==0){
+            // dbg("a");
+            ans+= val1*(n*(n+1)/2);
+        }
+        else if (total == 0){
+            // dbg("b");
+            ans+= (uq_sum[0])*val1;
+        }
+        else if(sum1 ==0){
+            continue;
+        }
+        else{
+            if((total% sum1)==0){
+                int k = (total/sum1);
+                if(k > 9*n) continue;
+                int it = uq_sum[(total/sum1)];
+                ans+= (it)*val1;
+            }
+        }
+    }
+
+    cout << ans;
+
 }
 
 int32_t main() {

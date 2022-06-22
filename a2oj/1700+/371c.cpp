@@ -26,40 +26,53 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void solve() {
-    int n ; cin >> n;
-    vector<vi> arr(n, vi(3));
-    rep(j,0,3)
-        rep(i,0,n) cin >> arr[i][j];
-    int dp[n][2][2];
-
-    rep(i,0,n){
-        dp[i][0][0] = arr[i][0];
-        dp[i][0][1] = arr[i][1];
-        dp[i][1][0] = arr[i][1];
-        dp[i][1][1] = arr[i][2];
-
-        // cout << "( " << i <<" , " << i << " ) " << dp[i][i][0][0] << " " << dp[i][i][0][1] << " " << dp[i][i][1][0] << " " << dp[i][i][1][1]  << endl;
-    }
-
-    rep(i,0,n){
-        int new_dp[n][2][2];
-        for(int l = 1; i+l < n;l++){
-            new_dp[i][1][1] = max(dp[i][1][0]+ arr[i+l][2],dp[i][1][1] + arr[i+l][1]);
-            new_dp[i][1][0] = max(dp[i][1][0]+ arr[i+l][1], dp[i][1][1] + arr[i+l][0]);
-            new_dp[i][0][1] = max(dp[i][0][1]+ arr[i+l][1], dp[i][0][0] + arr[i+l][2]);
-            new_dp[i][0][0] = max(dp[i][0][0]+ arr[i+l][1], dp[i][0][1] + arr[i+l][0]);
-
-            dp[i][0][0] = new_dp[i][0][0];
-            dp[i][0][1] = new_dp[i][0][1];
-            dp[i][1][0] = new_dp[i][1][0];
-            dp[i][1][1] = new_dp[i][1][1];
-            
-            // cout << "( " << i <<" , " << (i+l) << " ) " << dp[i][i+l][0][0] << " " << dp[i][i+l][0][1] << " " << dp[i][i+l][1][0] << " " << dp[i][i+l][1][1] << endl;
+bool bs(int k, vi& has, vi& cost, vi& cnt,int total){
+    int sum =0;
+    rep(i,0,3){
+        int req = k*cnt[i] - has[i];
+        if(req >0){
+            sum += req*cost[i];
         }
     }
 
-    cout << dp[0][0][0] << endl;
+    return sum <= total;
+}
+
+void solve() {
+    string s; cin >> s;
+    vi has(3); for(int &x: has) cin >> x;
+    vi cost(3); for(int &x: cost) cin >> x;
+    int total; cin >> total;
+    vi cnt(3,0); 
+    for(char c: s){
+        if(c == 'B') ++cnt[0];
+        else if(c == 'S') ++cnt[1];
+        else ++cnt[2];
+    }
+
+    dbg(cnt);
+
+    int l=0, r= 1e15 +5 ;
+
+    while(r-l>1){
+        int mid = (r+l)/2;
+        if(bs(mid,has,cost,cnt,total)){
+            l = mid;
+        }
+        else{
+            r = mid-1;
+        }
+    }
+
+    rep(i,r+1,l){
+        if (bs(i,has,cost,cnt,total)) {
+            cout << i << endl;
+            return;
+        }
+    }
+
+
+
 }
 
 int32_t main() {
