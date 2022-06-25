@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -26,74 +26,41 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-bool isPossible(int time, int n, int m , vi arr){
-    // dbg(time);
-    int curr = n-1;        
-    for(int i=0;i<m;i++){
-        if(curr <0){
-            return true;
-        }
-        while(arr[curr]==0 && curr>=0){
-            curr--;
-        }
-        if(curr== -1){
-            return true;
-        }
-        // dbg(curr);
-        int time_taken = curr+1;
-        int rem = time - time_taken;
-        if(rem <= 0){
-            return false;
-        }
-        while(rem >0){
-            // dbg(rem);
-            while(arr[curr]==0 && curr>=0){
-                curr--;
-            }
-            if(curr== -1){
-                return true;
-            }
-            // dbg(curr);
-            int temp = min(arr[curr], rem);
-            rem -= temp;
-            arr[curr] -= temp;
-        }
-    }
-    // dbg(curr);
-    while(arr[curr]==0 && curr>=0){
-        curr--;
-    }
-    if(curr== -1){
-        return true;
-    }
-
-    return false;
-}
-
 void solve() {
-    int n, m; cin >> n >> m;
-    vi arr(n); for(int &x: arr) cin >> x;
+    int n, w; cin >> n >> w;
+    if(n< w){
+        cout << -1;
+        return ;
+    }
+    vi arr(n+w+1); arr[w] = 0;
+    rep(i,0,n) cin >> arr[i+w+1];
+    rep(i,0,w) cin >> arr[i];
 
-    int l = 0, r = 1e18;
+    // dbg(arr);
 
-    int ans = r;
+    int len = n+w+1;
+    vi z(len,0);
 
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid, n, m, arr)){
-            r = mid;
-            ans = min(ans, mid);
+    for(int i=1, l= 0, r =0; i< len ;i++){
+        if(i<=r){
+            z[i] = min(z[i-l], r-i+1);
         }
-        else{
-            l = mid+1;
+        while(i+z[i]< len && z[i]<=w && (arr[i+z[i]]-arr[z[i]])==(arr[i]-arr[0])){
+            ++z[i];
+        }
+        if (i + z[i] - 1 > r){
+            l = i, r = i + z[i] - 1;
         }
     }
+    // dbg(z);
+    int ans =0;
+    for(int i =w+1;i<len ;i++){
+        if(z[i]==w){
+            ++ans;
+        }
+    }    
 
-    rep(i,l,r+1){
-        if(isPossible(i,n,m,arr)) ans = min(ans, i);
-    }
-
-    cout << ans;
+    cout << ans <<'\n';
 }
 
 int32_t main() {

@@ -26,74 +26,8 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-bool isPossible(int time, int n, int m , vi arr){
-    // dbg(time);
-    int curr = n-1;        
-    for(int i=0;i<m;i++){
-        if(curr <0){
-            return true;
-        }
-        while(arr[curr]==0 && curr>=0){
-            curr--;
-        }
-        if(curr== -1){
-            return true;
-        }
-        // dbg(curr);
-        int time_taken = curr+1;
-        int rem = time - time_taken;
-        if(rem <= 0){
-            return false;
-        }
-        while(rem >0){
-            // dbg(rem);
-            while(arr[curr]==0 && curr>=0){
-                curr--;
-            }
-            if(curr== -1){
-                return true;
-            }
-            // dbg(curr);
-            int temp = min(arr[curr], rem);
-            rem -= temp;
-            arr[curr] -= temp;
-        }
-    }
-    // dbg(curr);
-    while(arr[curr]==0 && curr>=0){
-        curr--;
-    }
-    if(curr== -1){
-        return true;
-    }
-
-    return false;
-}
-
 void solve() {
-    int n, m; cin >> n >> m;
-    vi arr(n); for(int &x: arr) cin >> x;
-
-    int l = 0, r = 1e18;
-
-    int ans = r;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid, n, m, arr)){
-            r = mid;
-            ans = min(ans, mid);
-        }
-        else{
-            l = mid+1;
-        }
-    }
-
-    rep(i,l,r+1){
-        if(isPossible(i,n,m,arr)) ans = min(ans, i);
-    }
-
-    cout << ans;
+    
 }
 
 int32_t main() {
