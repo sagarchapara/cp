@@ -26,89 +26,59 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void solve() {
-    int n; cin >> n;
-    string s; cin >> s;
-    vi arr(n);
-    map<int,int> child, adult;
+const int MAXN = 5e6+5;
 
-    rep(i,0,n){
-        int w; cin >> w; arr[i] = w;
-        if(s[i]=='0'){
-            if(!child.count(w)){
-                child[w]=0;
+int lpf[MAXN];
+int prime[MAXN];
+
+void compute(){
+    fill(prime, prime+MAXN, 0);
+    vector<bool> isPrime(MAXN+2, true);
+    for(int i=2;i<MAXN;i++){
+        if(isPrime[i]){
+            lpf[i] = i;
+            for(int j = i*i ;j<MAXN ; j+=i){
+                if(isPrime[j]){
+                    isPrime[j] = false;
+                    lpf[j] =i;
+                } 
             }
-            child[w]++;
-        }
-        else{
-            if(!adult.count(w)){
-                adult[w]=0;
-            }
-            adult[w]++;
         }
     }
 
     int val =0;
-    for(auto [k,v]: child){
-        val+=v;
-        child[k] = val;
+    for(int i=2;i<MAXN;i++){
+        int cnt =0; int curr =i;
+        while(curr!=1){
+            cnt++;
+            curr/=lpf[curr];
+        }
+        prime[i] = cnt + val;
+        val = prime[i];
     }
 
-    val = 0;
-    for (auto iter = adult.rbegin(); iter != adult.rend(); ++iter) {
-        val+= iter->second;
-        adult[iter->first] = val;
+    // rep(i,1,11) dbg(prime[i]);
+}
+
+void solve() {
+    int tc; cin >> tc;
+    rep(i,0,tc){
+        int a, b; cin >> a >> b;
+        int ans = prime[a]-prime[b];
+        printf("%d\n", ans);
     }
-
-    dbg(child); dbg(adult);
-
-    int ans =0;
-    rep(i,0,n){
-        int w = arr[i], w2 = (arr[i]+1);
-        int total =0;
-
-        auto it = child.lower_bound(w);
-        if(it != child.begin()){
-            --it;
-            total+= it->second;
-        }
-        
-
-        it = adult.lower_bound(w);
-        if(it != adult.end()){
-            total += it->second;
-        }
-
-        ans = max(ans, total);
-
-        total =0;
-
-        it = child.lower_bound(w2);
-        if(it != child.begin()){
-            --it;
-            total+= it->second;
-        }
-        
-
-        it = adult.lower_bound(w2);
-        if(it != adult.end()){
-            total += it->second;
-        }
-
-        ans = max(ans, total);
-    }
-
-    cout << ans;    
 }
 
 int32_t main() {
     #ifdef SAGAR
         freopen("input.txt", "r", stdin);
         // freopen("output.txt", "w", stdout);
-    #else
-        ios_base::sync_with_stdio(0);
-        cin.tie(0); cout.tie(0);
     #endif
+
+    ios_base::sync_with_stdio(0);
+    cin.tie(0); cout.tie(0);
+
+    compute();
 
     int tc = 1;
     // cin >> tc;

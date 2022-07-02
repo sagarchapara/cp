@@ -20,85 +20,87 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define F first
 #define S second
 #define pi pair<int,int>
+#define pii pair<int,pi>
 #define vi vector<int>
-#define vpi vector<pi>
+#define vii vector<vector<pi>>
+#define vpii vector<pii>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
-    }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
-}
+# define INF 0x3f3f3f3f
 
 void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
+    int n,m,s; cin >> n >> m >> s; s--;
+    vii adj(n); 
+    vpii edges(m);
+    priority_queue<pi, vector<pi>, greater<pi>> pq;
+    vi d(n, INF); 
+    rep(i,0,m){
+        int u,v,w; cin >> u >> v >> w; u--, v--;
+        edges[i] = {w, {u,v}};
+        adj[u].push_back({v,w});
+        adj[v].push_back({u,w});
+    }
+    int l; cin >> l;
+
+    dbg(adj); dbg(l);
+
+    vi num(n, 0); 
+    // vector<bool> visited(n, false);
+
+    d[s] =0; 
+    // visited[s] = true;
+
+    pq.push({0,s});
+    int ans =0;
+
+    while(!pq.empty()){
+        auto [dist, curr] = pq.top();
+        pq.pop();
+        for(pi nxt: adj[curr]){
+            int nxtDist = d[curr] + nxt.S;
+            if(nxtDist < d[nxt.F]){
+                d[nxt.F] = nxtDist;
+                // if(!visited[nxt.F]){
+                pq.push({nxtDist, nxt.F});
+                // visited[nxt.F] = true;
+                // }
+            }
+        }
+    }
+
+    // dbg(d);
+
+
+
+    vector<bool> hasTaken(n, false);
+    for(auto edge: edges){
+        int w = edge.F;
+        int u = edge.S.F, v = edge.S.S;
+        // dbg(edge);
+        if(d[u]< l && d[u]+w > l){
+            int k = l-d[u];
+            if(d[v]+w-k >= l){
+                ans++;
+            }
+        }
+        if(d[v]< l && d[v]+w > l){
+            int k = l - d[v];
+            if(d[u]+w-k > l){
+                ans++;
+            }
+        }
+
+    }
     rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
-
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
+        if(d[i]==l){
+            ans++;
         }
     }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
-
     cout << ans << endl;
+
 }
 
 int32_t main() {

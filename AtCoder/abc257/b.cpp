@@ -27,6 +27,25 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
+    int n, k, q; cin >> n >> k >> q;
+    vi arr(k); for(int &x: arr) cin >> x;
+
+    rep(i,0,q){
+        int l; cin >> l; --l;
+        if(arr[l]!= n){
+            if(l+1<k){
+                if(arr[l+1]!= (arr[l]+1)){
+                    arr[l]++;
+                }
+            }
+            else{
+                arr[l]++;
+            }
+        }
+    }
+
+    cout << arr << endl;
+
     
 }
 

@@ -20,85 +20,69 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define F first
 #define S second
 #define pi pair<int,int>
-#define vi vector<int>
-#define vpi vector<pi>
+#define pii pair<int,pi>
+#define vpii vector<pii>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
+vpii t;
+
+pii merge_node(pii& a, pii& b){
+    int minb = min(a.second.first, b.second.second);
+    pii ans;
+    ans.first = a.first+b.first + 2*(minb);
+    ans.second.first = a.second.first + b.second.first - minb;
+    ans.second.second = a.second.second + b.second.second -minb;
+
+    return ans;
+}
+
+//build v= 1 tl=0 tr=n-1
+void build(string& a, int v, int tl, int tr) {
+    if (tl == tr) {
+        if(a[tl]=='(') t[v] = {0,{1,0}};
+        else t[v] = {0,{0,1}};
+    } else {
+        int tm = (tl + tr) / 2;
+        build(a, v*2, tl, tm);
+        build(a, v*2+1, tm+1, tr);
+        t[v] = merge_node(t[v*2], t[v*2+1]);
     }
 }
 
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
+pii query(int v, int tl, int tr, int l, int r){
+    if (l > r) 
+        return {0,{0,0}};
+    if (l == tl && r == tr) {
+        return t[v];
     }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
+    int tm = (tl + tr) / 2;
+    int ans =0;
+    auto a1 = query(v*2, tl, tm, l, min(r, tm));
+    auto a2 = query(v*2+1, tm+1, tr, max(l, tm+1), r);
+    return merge_node( a1,a2);
 }
 
 void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
+    string s; cin >> s;
+    int n = s.size();
+
+    t.resize(4*n);
+
+    // dbg(n);
+
+    build(s,1,0,n-1);
+
+    // dbg(t);
+
+    int m ; cin >> m;
+    rep(i,0,m){
+        int l,r ; cin >> l >> r; l-- ; r--;
+        cout << query(1,0,n-1,l,r).first << endl;
     }
 
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
-
-    cout << ans << endl;
 }
 
 int32_t main() {

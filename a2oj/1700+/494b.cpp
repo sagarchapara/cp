@@ -21,84 +21,72 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
+const int MOD = 1e9+7;
 
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
+vi zfunc(string s, int n){
+    vi z(n);
+    z[0]= 0;
+    for(int i =1, l=0, r=0; i<n;i++){
+        if(i<=r){
+            z[i] = min(z[i-l], r-i+1);
+        }
+        while(i+z[i]< n && s[i+z[i]]==s[z[i]]){
+            ++z[i];
+        }
+        if(i+z[i]-1 > r){
+            l =i, r = i+z[i]-1;
         }
     }
 
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
+    return z;
 }
 
 void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
+    string s, t; cin >> s >> t;
+
+    if(t.size() > s.size()){
+        cout << 0;
+        return;
     }
 
-    int l = 0,  r = 1e10;
+    string sp = t + '$'+ s;
 
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
+    vi z = zfunc(sp, sz(sp));
 
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
+    //find all starting positions
+    vi arr; int t_size = t.size(); int s_size = s.size();
+
+    for(int i = t_size+1;i < sz(sp); i++){
+        if(z[i] == t_size){
+            arr.push_back(i-t_size-1);
         }
     }
 
-    cout << ans << endl;
+    if(arr.size()==0){
+        cout << 0;
+        return;
+    }
+    int n = arr.size();
+
+    vector<vi> dp(n, vi(2));
+
+    int eidx = (arr[n-1]+t_size-1);
+    dp[n-1][0] = dp[n-1][1] =(s_size-eidx+1);
+
+    for(int i=n-2;i>=0;i--){
+        int t = dp[i+1][0]/(s_size-eidx+1) ;
+        
+        int currIdx = arr[i+1]-arr[i] - 
+
+    }
+
+
+
 }
 
 int32_t main() {

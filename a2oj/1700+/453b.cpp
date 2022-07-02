@@ -26,7 +26,7 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-const int MAXN = 60;
+const int MAXN = 59;
 int lp[MAXN];
 vi primes;
 
@@ -50,63 +50,50 @@ void getPrimes(){
 void solve() {
     int n; cin >> n;
     vi arr(n); for(int &x: arr) cin >> x;
-    // dbg(arr);
+    dbg(arr);
     getPrimes();
 
-    // dbg(primes);
+    dbg(primes);
 
-    int nbits = primes.size()-1;
+    int nbits = primes.size();
     map<int,int> pPos;
     rep(i,0,nbits){
         pPos[primes[i]] = i;
     }
 
-    vector<vi> dp(n, vi((1<<nbits),100));
+    vector<vi> dp(n, vi((1<<nbits),3000));
 
     rep(i,0,n){
-        for(int j =0;j<(1<<nbits);j++){
-            for(int k = 1;k<59;k++){
-                //find mask of k
-                if(k==1){
-                    int sum = abs(arr[i]-1);
-                    if(i>0){
-                        sum+=dp[i-1][j];
-                    }
-                    dp[i][j] = min(dp[i][j], sum);
-                }
-                else{
-                    int mask =0; int curr =k;
-                    while(curr!=1){
-                        mask|= (1<<(pPos[lp[curr]]));
-                        curr/=lp[curr];
-                    }
-                    if((j & mask) == mask){
-                        if(i==0){
-                            if(j==mask){
-                                dp[i][j] = min(abs(arr[i]-k), dp[i][j]);
-                            }
-                        }
-                        else{
-                            int sum =0;
-                            sum += abs(arr[i]- k);
-                            sum+= dp[i-1][j^mask];
-                            dp[i][j] = min(sum, dp[i][j]);
-                        }
-                    }
-                }
+        rep(j,1,59){
+            int mask =0; int curr =j;
+            while(curr!=1){
+                mask|=(1<<(pPos[lp[curr]]));
+                curr/=lp[curr];
+            }
+            if(i==0){
+                dp[i][mask] = min(abs(arr[i]-j), dp[i][mask]);
+                continue;
+            }
+            int rem_mask = (mask ^ ((1<<nbits)-1));
+            for (int s=rem_mask; ; s=(s-1)&rem_mask) {
+                int val = abs(arr[i]-j);
+                val+=dp[i-1][s];
+                dp[i][s|mask] = min(dp[i][s|mask], val);
+                if (s==0)  break;
             }
         }
     }
 
-    // dbg("HI");
+    dbg("HI");
 
     vi ans;
-
+    
     int minVal = dp[n-1][0], idx = 0;
     for(int j=0;j<(1<<nbits);j++){
         if(dp[n-1][j] < minVal){
             minVal = dp[n-1][j];
             idx = j;
+            dbg(minVal); dbg(idx);
         }
     }
 
@@ -126,7 +113,7 @@ void solve() {
             }
             if(val == minVal){
                 ans.push_back(k);
-                // dbg(k);
+                dbg(k);
                 if(i>0){
                     minVal = dp[i-1][idx^mask];
                     idx = idx^mask;

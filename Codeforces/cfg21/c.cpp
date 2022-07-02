@@ -21,84 +21,94 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
-    }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
+    int n,m,k ; cin >> n >> m;
+    vi a(n); for(int &x: a) cin >> x;
+    cin >> k; vi b(k); for(int &x: b) cin>> x;
+
+    // if((n-k)%(m-1)!=0){
+    //     cout << "No\n";
+    //     return;
+    // }
+
+    vector<pi> na;
     rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
+        int x = a[i]; int num =1;
+        while((x%m)==0){
+            x/=m;
+            num*=m;
+        }
+        na.push_back({x,num});
     }
 
-    int l = 0,  r = 1e10;
+    dbg(na);
+    vector<pi> nb;
+    rep(i,0,k){
+        int x = b[i], num =1;
+        while((x%m)==0){
+            x/=m;
+            num*=m;
+        }
+        nb.push_back({x,num});
+    }
+    dbg(nb);
 
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
+
+
+    vector<pi> ma, mb;
+    int count = na.size();
+    rep(i,0,count){
+        if(i==0){
+            ma.push_back(na[i]);
         }
         else{
-            l = mid+1;
+            int prev = ma.size()-1;
+            if(ma[prev].first == na[i].first){
+                ma[prev].second+=na[i].second;
+            }
+            else{
+                ma.push_back(na[i]);
+            }
+        }
+    }
+    count = nb.size();
+    rep(i,0,count){
+        if(i==0){
+            mb.push_back(nb[i]);
+        }
+        else{
+            int prev = mb.size()-1;
+            if(mb[prev].first == nb[i].first){
+                mb[prev].second+=nb[i].second;
+            }
+            else{
+                mb.push_back(nb[i]);
+            }
         }
     }
 
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
+    dbg(ma);
+    dbg(mb);
+
+    if(ma.size() != mb.size()){
+        cout << "NO\n";
+        return;
+    }
+
+    count = ma.size();
+    rep(i,0,count){
+        if(ma[i]!=mb[i]){
+            cout << "NO\n";
+            return;
         }
     }
 
-    cout << ans << endl;
+    cout << "YES\n";
 }
 
 int32_t main() {
@@ -111,7 +121,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

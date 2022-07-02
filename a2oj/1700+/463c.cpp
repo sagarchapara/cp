@@ -21,84 +21,45 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
+void solve() {
+    int n; cin >> n;
+    vi dp1(2*n,0), dp2(2*n,0);
+    vector<vi> arr(n,vi(n));
     rep(i,0,n){
         rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
+            int x; cin >> x;
+            arr[i][j] = x;
+            dp1[i+j]+=x;
+            dp2[n+i-j]+=x;
+        }
+    }
+    int max1 = -1; int max2 =-1;
+    pi p1,p2;
+    rep(i,0,n){
+        rep(j,0,n){
+            int next = dp1[i+j]+ dp2[n+i-j] - arr[i][j];
+            if((i+j)%2==0){
+                if(next > max1){
+                    max1 = next;
+                    p1 = {i+1, j+1};
+                }
+            }
+            else {
+                if(next > max2){
+                    max2 = next;
+                    p2 = {i+1, j+1};
                 }
             }
         }
     }
 
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
-}
-
-void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
-
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
-
-    cout << ans << endl;
+    cout << max1 + max2 << endl;
+    cout << p1 << " " << p2 << endl;
 }
 
 int32_t main() {

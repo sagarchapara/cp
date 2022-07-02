@@ -21,84 +21,65 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
+#define vpi vector<vector<pi>>
+#define vii vector<vector<int>>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
+bool verify(vii& arr, int n, int m){
     rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
+        rep(j,1,m){
+            if(arr[i][j] < arr[i][j-1]) return false;
         }
     }
 
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
+    return true;
 }
 
 void solve() {
-    int n; cin >> n;
-    vpi points(n); vi power(n);
+    int n,m ; cin >> n >> m;
+    vii arr(n, vi(m));  vii sarr(n, vi(m));
     rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
+        rep(j,0,m){
+            int x; cin >> x;
+            arr[i][j] = x;
+            sarr[i][j] = x;
+        }
+        sort(all(sarr[i]));
+    }
+    int num =0; int cola = 0, colb = 0;
+    rep(j,0,m){
+        bool areEqual = true;
+        rep(i,0,n){
+            if(arr[i][j]!= sarr[i][j]){
+                areEqual = false;
+                break;
+            }
+        }
+        if(!areEqual){
+            num++;
+            if(num>2){
+                cout << -1 << endl;
+                return;
+            }
+            else if(num==2) colb = j;
+            else cola =j;
+        }
+    }
+    if(num==2){
+        rep(i,0,n){
+            swap(arr[i][cola], arr[i][colb]);
+        }
+    }
+    if(verify(arr, n ,m)){
+        cout << (cola+1) << " " << (colb+1) << endl;
+        return;
     }
 
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
-
-    cout << ans << endl;
+    cout << -1 << endl;
+    
 }
 
 int32_t main() {
@@ -111,7 +92,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

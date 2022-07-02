@@ -21,84 +21,77 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
+#define vii vector<vi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
+const int MOD = 1e9+7;
 
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
+bool dfs(int curr,int par,vii& adj,vi& color,vii& dp){
+    vi seen;
+    if(color[curr] == 1){
+        dp[curr][0] =0; dp[curr][1] = 1; int prod = 1;
+        for(int nxt: adj[curr]){
+            if(nxt!=par){
+                bool t = dfs(nxt, curr, adj, color, dp);
+                if(t){
+                    int temp = ((dp[nxt][1]+dp[nxt][0]))%MOD;
+                    prod = (prod*temp)%MOD;
                 }
             }
         }
-    }
+        dp[curr][1] = prod;
 
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
+        return true;
+    }
+    else{
+        dp[curr][0] = 1; dp[curr][1] = 0; int count =0;
+        for(int nxt: adj[curr]){
+            if(nxt!=par){
+                bool t = dfs(nxt, curr, adj, color, dp);
+                if(t){
+                    int temp = (dp[nxt][0] + dp[nxt][1])%MOD;
+                    dp[curr][0] = (dp[curr][0]*temp)%MOD;
+                    count++;
+                    seen.push_back(nxt);
+                }
             }
         }
-        if(isTrue){
-            return true;
+        // dbg(count);
+        int prod = dp[curr][0]; dp[curr][1] =0;
+        for(int nxt: seen){
+            int temp = (dp[nxt][0] + dp[nxt][1])%MOD;
+            temp = (prod/temp)%MOD;
+            temp = (temp*dp[nxt][1])%MOD;
+            dp[curr][1]+=temp;
         }
+        return count >0 ;
     }
-
-    return false;
 }
 
 void solve() {
     int n; cin >> n;
-    vpi points(n); vi power(n);
+    vii adj(n); vii dp(n,vi(2,0));
+    rep(i,1,n){
+        int x; cin >> x;
+        adj[i].push_back(x);
+        adj[x].push_back(i);
+    }
+    vi color(n); for(int& x:color) cin >> x;
+
+    int ans = 0;
     rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
-
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
+        if(color[i]== 1){
+            dfs(i,-1,adj,color,dp);
+            ans = dp[i][1];
             break;
         }
     }
+    dbg(dp);
 
-    cout << ans << endl;
+    cout << ans;
 }
 
 int32_t main() {

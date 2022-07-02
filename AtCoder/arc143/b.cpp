@@ -21,84 +21,47 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
+const int MAXN = 250000+5;
+int MOD = 998244353;
+int fact[MAXN];
+int inv[MAXN];
+
+int ncr(int n, int r){
+    int ans = (inv[r]*inv[n-r])%MOD;
+    ans = (ans*fact[n])%MOD;
+    return ans;
 }
 
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
+void compute(){
+    fact[0] = 1;
+    for (int i = 1; i < MAXN; i++){
+        fact[i] = (fact[i - 1] * i) % MOD;
+        // dbg(fact[i]);
     }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
+        
 }
 
 void solve() {
     int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
+    int ans = 1;
 
-    int l = 0,  r = 1e10;
+    memset(fact, 1, MAXN);
+    compute();
 
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
-        }
-        else{
-            l = mid+1;
-        }
-    }
+    ans = (fact[n*n])%MOD;
+    int temp = (2*fact[n*(n-1)])%MOD;
+    temp = (temp*fact[n])%MOD;
+    temp =(temp*n)%MOD;
 
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
+    ans = (ans - temp + MOD)%MOD;
+    ans = ans%MOD;
 
-    cout << ans << endl;
+    cout << ans;
 }
 
 int32_t main() {

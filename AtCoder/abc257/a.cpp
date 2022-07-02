@@ -27,7 +27,14 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    
+    int n, x; cin >> n >> x;
+    int val = x/n;
+    char c ='A';
+    c+=val;
+    if(x%n ==0){
+        c-=1;
+    }
+    cout << c<< endl;
 }
 
 int32_t main() {

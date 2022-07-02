@@ -21,84 +21,52 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
-    }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
-    }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
-}
-
 void solve() {
     int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
-
-    int l = 0,  r = 1e10;
-
-    while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
-            r = mid;
+    string s,t ; cin >> s >> t;
+    int i=0; int currb =0, currc = 0;
+    while(i<n){
+        if(s[i] == t[i]) {
+            i++;
+            continue;
+        }
+        if(s[i] == 'a' && t[i] == 'b'){
+            //find next b
+            currb = max(i, currb); 
+            while(currb < n && s[currb]=='a'){
+                currb++;
+            }
+            if(currb == n || s[currb]!= 'b'){
+                cout << "NO\n";
+                return;
+            }
+            swap(s[i], s[currb]);
+        }
+        else if(s[i] == 'b' && t[i] == 'c'){
+            //find next c
+            currc = max(i, currc);
+            while(currc < n && s[currc]=='b'){
+                currc++;
+            }
+            if(currc == n || s[currc]!= 'c'){
+                cout << "NO\n";
+                return;
+            }
+            swap(s[i], s[currc]);
         }
         else{
-            l = mid+1;
+            cout << "NO\n";
+            return;
         }
+        i++;
     }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
-            break;
-        }
-    }
-
-    cout << ans << endl;
+    cout << "YES\n";
+    return;
 }
 
 int32_t main() {
@@ -111,7 +79,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

@@ -1,7 +1,7 @@
 // g++ -o out <filename>.cpp
 // .\out.exe
 
-#define SAGAR
+// #define SAGAR
 
 #include <bits/stdc++.h>
 using namespace std;                                    
@@ -21,84 +21,63 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define S second
 #define pi pair<int,int>
 #define vi vector<int>
-#define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define rep(x,start,end) for(auto x=(start)-((start)>(end));x!=(end)-((start)>(end));((start)<(end)?x++:x--))
 #define sz(x) (int)(x).size()
 
-void dfs(int curr, vector<vi>& adj, vi& visited){
-    visited[curr] = true;
-    for(int i: adj[curr]){
-        if(!visited[i]){
-            dfs(i, adj, visited);
-        }
+vi query(int l, int r){
+    cout << "? " <<  l << " " << r << endl;
+    int n = r - l + 1;
+    vi v(r-l+1);
+    for (int i = 0; i < n; i++) {
+        cin >> v[i];
+        if (v[i] == -1) exit(0);
     }
-}
-
-bool isPossible(int s, int n, vpi& points, vi& power){
-    vector<vi> adj(n);
-    rep(i,0,n){
-        rep(j,0,n){
-            if(i!=j){
-                int sum = abs(points[i].F - points[j].F);
-                sum+= abs(points[i].S - points[j].S);
-                if(sum <=  s*power[i]){
-                    adj[i].push_back(j);
-                }
-            }
-        }
-    }
-
-    rep(i,0,n){
-        vi visited(n, false);
-        dfs(i,adj,visited);
-        bool isTrue = true;
-        for(int i=0;i<n;i++){
-            if(!visited[i]){
-                isTrue = false;
-                break;
-            }
-        }
-        if(isTrue){
-            return true;
-        }
-    }
-
-    return false;
+    return v;
 }
 
 void solve() {
     int n; cin >> n;
-    vpi points(n); vi power(n);
-    rep(i,0,n){
-        int x, y, p;
-        cin >> x >> y >> p;
-        points[i]= {x,y};
-        power[i] = p;
-    }
-
-    int l = 0,  r = 1e10;
-
+    int l =1, r = n;
     while(r-l>1){
-        int mid = (l+r)/2;
-        if(isPossible(mid,n,points,power)){
+        int mid = (r+l)/2;
+        vi arr = query(1,mid);
+        dbg(arr);
+        int count1 =0; 
+        int count2 =0, count3=0;
+        for(int i=0;i<mid;i++){
+            if(arr[i]<mid){
+                count1++;
+            }
+            else if(arr[i]==mid){
+                count3++;
+            }
+            else{
+                count2++;
+            }
+        }
+        dbg(count1); dbg(count2); dbg(count3);
+        if(count1%2 !=0 && count3 ==0){
+            r = mid-1;
+        }
+        else if(count1%2 ==0 && count3 == 1){
             r = mid;
         }
         else{
             l = mid+1;
         }
     }
-
-    int ans = r;
-    for(int i=l; i<=r;i++){
-        if(isPossible(i,n,points,power)){
-            ans = i;
+    for(int i=l;i<=r;i++){
+        // printf("? %d %d\n",i,i);
+        vi arr = query(i,i);
+        if(arr[0] == i){
+            // printf("! %d\n", x);
+            cout << "! "<< i << endl;
             break;
         }
     }
-
-    cout << ans << endl;
+    return;
 }
 
 int32_t main() {
@@ -111,7 +90,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }
