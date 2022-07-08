@@ -1,6 +1,9 @@
 #include <bits/stdc++.h>
 using namespace std;
 
+#define vi vector<int>
+#define all(x) (x).begin(), (x).end()
+
 /**
 ===============================================================
     Strongly connected components
@@ -79,3 +82,36 @@ void dfs2(int v, vector<vector<int>>& adj_rev, vector<bool>& used, vector<int>& 
 //         }
 //     }
 // }
+
+//DSU
+class DSU {
+    vi parent;
+    int n;
+
+    public:
+        DSU (int _n): n(_n){
+            parent.resize(n);
+            iota(all(parent), 0ll);
+        }
+
+        ~DSU(){
+            parent.clear();
+        }
+
+        int find_set(int v) {
+            if (v == parent[v])
+                return v;
+            return parent[v] = find_set(parent[v]);
+        }
+
+        bool check(int u, int v){
+            return find_set(u) != find_set(v);
+        }
+
+        void union_sets(int a, int b) {
+            a = find_set(a);
+            b = find_set(b);
+            if (a != b)
+                parent[b] = a;
+        }
+};
