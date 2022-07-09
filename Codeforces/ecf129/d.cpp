@@ -24,8 +24,58 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+pair<set<int>, int> decimal(int k){
+    set<int> s; int num =0;
+    while(k>0){
+        s.insert(k%10);
+        k/=10;
+        num++;
+    }
+
+    return {s, num};
+}
+
 void solve() {
-    
+    int n, x; cin >> n >> x;
+    queue<pi> q; int ans = -1; 
+
+    q.push({x, 0}); 
+
+    set<int> seen; int max_num = -1;
+    seen.insert(x);
+
+    while(q.size()>0){
+        pi p = q.front(); q.pop();        
+        dbg(p);
+
+        auto next = decimal(p.first);
+
+        if(max_num == -1) max_num = next.second;
+        else max_num = max(max_num, next.second);
+
+        if(next.second == n){
+            ans = p.second;
+            break;
+        }
+
+        if(next.second < max_num-1){
+            continue;
+        }
+
+        else if (next.second > n) continue;
+
+        for(int i: next.first){
+            if(i!=1 && i!=0){
+                int k = i*p.first;
+                if(!seen.count(k)){
+                    q.push({i*p.first, p.second+1});
+                    seen.insert(k);
+                }
+            }
+        }
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {
@@ -37,15 +87,9 @@ int32_t main() {
         cin.tie(0); cout.tie(0);
     #endif
 
-    auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-
     int tc = 1;
     // cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }
-
-    auto stop = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-
-    cerr << "Took " << stop - start << "ms" << endl;
 }

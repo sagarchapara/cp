@@ -37,15 +37,9 @@ int32_t main() {
         cin.tie(0); cout.tie(0);
     #endif
 
-    auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-
     int tc = 1;
     // cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }
-
-    auto stop = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
-
-    cerr << "Took " << stop - start << "ms" << endl;
 }

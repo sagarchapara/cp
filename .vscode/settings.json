@@ -20,7 +20,8 @@
         "unordered_set": "cpp",
         "vector": "cpp",
         "initializer_list": "cpp",
-        "valarray": "cpp"
+        "valarray": "cpp",
+        "condition_variable": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
