@@ -25,15 +25,21 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m, x, t ,d; cin >> n >> m>> x >> t >> d;
+    int x, y,z, a,b; cin >> x >> y >> z >> a >> b;
 
-    if(m >=x){
-        cout << (t);
+    int rem = z;
+    if(x+rem >= a){
+        rem-= max(0ll,a-x);
     }
-    else{
-        int h = t- x*d + m*d;
-        cout << h;
+    else goto bad;
+
+    if(y+rem >= b){
+        cout << "Yes" << endl;
+        return;
     }
+
+    bad:
+        cout << "No" << endl;
 }
 
 int32_t main() {
@@ -46,7 +52,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

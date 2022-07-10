@@ -17,6 +17,7 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define int long long
 #define pi pair<int,int>
 #define vi vector<int>
+#define vvi vector<vi>
 #define vpi vector<pi>
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
@@ -24,15 +25,66 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-void solve() {
-    int n, m, x, t ,d; cin >> n >> m>> x >> t >> d;
-
-    if(m >=x){
-        cout << (t);
+void form_set(int curr, vvi& adj,vi&d, vi& curr_set, vvi& ans){
+    curr_set.push_back(curr);
+    if(adj[curr].size()==0){
+        ans.push_back(curr_set);
+        return;
     }
-    else{
-        int h = t- x*d + m*d;
-        cout << h;
+    bool found = false; int idx =-1;
+    for(int i: adj[curr]){
+        if(d[i]+1 == d[curr]){
+            found = true;
+            idx = i;
+            break;
+        }
+    }
+
+    for(int i: adj[curr]){
+        if(i == idx){
+            form_set(i,adj,d, curr_set, ans);
+        }
+        else{
+            vi s;
+            form_set(i,adj,d,s, ans);
+        }
+    }
+}
+
+void dfs(int curr, vvi&adj, vi& d){
+    d[curr] = 1;
+    for(int i: adj[curr]){
+        dfs(i,adj, d);
+        d[curr] = max(d[curr], d[i]+1);
+    }
+}
+
+
+void solve() {
+    int n; cin >>n;
+    vi p(n); for(int &x:p) {cin >> x; --x;}
+    vvi adj(n);int root;
+    rep(i,0,n){
+        if(p[i]==i) root =i;
+        else{
+            adj[p[i]].push_back(i);
+        }
+    }
+    vi depth(n,0);
+    dfs(root, adj, depth);
+
+    vvi ans;
+
+    vi s;
+    form_set(root, adj, depth, s, ans);
+
+    printf("%d\n", ans.size());
+    rep(i,0,sz(ans)){
+        printf("%d\n", ans[i].size());
+        for(int j: ans[i]){
+            printf("%d ", (j+1));
+        }
+        printf("\n");
     }
 }
 
@@ -46,7 +98,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

@@ -24,16 +24,28 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-void solve() {
-    int n, m, x, t ,d; cin >> n >> m>> x >> t >> d;
-
-    if(m >=x){
-        cout << (t);
+vi getAns(int n){
+    if(n%2 ==1){
+        return vi ({1,(n-1)/2, (n-1)/2});
+    }
+    else if(n%4 == 0){
+        return vi ({n/2, n/4, n/4});
     }
     else{
-        int h = t- x*d + m*d;
-        cout << h;
+        return vi ({2, (n-2)/2, (n-2)/2});
     }
+}
+
+void solve() {
+    int n,k; cin >> n >> k;
+
+    rep(i,0,k-3){
+        cout << 1 << " ";
+    }
+
+    vi ans = getAns(n-k+3);
+
+    cout << ans << endl;        
 }
 
 int32_t main() {
@@ -46,7 +58,7 @@ int32_t main() {
     #endif
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

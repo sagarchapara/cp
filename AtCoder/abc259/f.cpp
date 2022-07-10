@@ -16,8 +16,10 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 
 #define int long long
 #define pi pair<int,int>
+#define pii pair<int, pi>
 #define vi vector<int>
 #define vpi vector<pi>
+#define vpii vector<set<pi>>
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 #define rep(i, begin, end) for (__typeof(end) i = (begin) - ((begin) > (end)); i != (end) - ((begin) > (end)); i += 1 - 2 * ((begin) > (end)))
@@ -25,15 +27,48 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m, x, t ,d; cin >> n >> m>> x >> t >> d;
+    int n; cin >> n; vpii arr(n); vi d(n);
+    for(int &x: d) cin >> x;
+    for(int i=0;i<n-1;i++){
+        int u,v,w; cin >> u >> v >> w; u--, v--;
+        if(u<v && w>0){
+            arr[v].insert({w,u});
+        }
+        else if(v>u && w>0){
+            arr[u].insert({w,v});
+        }
+    }
 
-    if(m >=x){
-        cout << (t);
+
+    map<int, multiset<int>> taken;
+    rep(i,1,n){
+        int rem = d[i];
+        for(auto it = arr[i].rbegin(); it!= arr[i].rend(); ++it){
+            pi p = (*it);
+            int u = p.second, w = p.first;
+            if(d[u]>0){
+                if(taken.count(u)>0){
+                    auto itr = taken[u].lower_bound(w);
+                    if(itr!=taken[u].begin()){
+                        if(d[u] == taken.count(u)){
+                            taken[u].erase(taken[u].begin());
+                        }
+                    }
+                    
+                }
+                else{
+                    multiset<int> taken[u];
+                    taken[u].insert(w);
+                }
+            }
+        }
     }
-    else{
-        int h = t- x*d + m*d;
-        cout << h;
+    rep(i,0,n){
+
     }
+
+
+    cout << ans << endl;
 }
 
 int32_t main() {

@@ -7,7 +7,7 @@ using namespace std;
 template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os <<  p.first << " " << p.second ;}
 template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { for (const T &x : v) os << x << " "; return os;}
 void dbg_out() { cerr << "" << endl; }
-template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << H ; dbg_out(T...); }
+template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << H << " " ; dbg_out(T...); }
 #ifdef SAGAR
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
@@ -25,7 +25,44 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
+    string s, t; cin >> s >> t;
+
+    int curr =0; int num =0; char pre = 0;
+    for(int i=0;i<s.size();i++){
+        if(curr >=t.size()) goto bad;
+        if(s[i] == t[curr]){
+            if(pre == s[i])  num++;
+            else{
+                num = 1;
+            }
+            curr++;
+            pre = s[i];
+        }
+        else{
+            if(num>=2){
+                int nxt = curr;
+                while(nxt< t.size() && t[nxt] == pre) nxt++;
+                if(nxt == t.size()) goto bad;
+                if(s[i]!=t[nxt]) goto bad;
+                pre = s[i];
+                num = 1;
+                curr = nxt+1;
+            }
+            else goto bad;
+        }
+    }
+    rep(i, curr, t.size()){
+        if(t[i]!=pre) goto bad;
+    }
+        
     
+
+    cout << "Yes" << endl;
+    return;
+
+    bad:
+        cout << "No" << endl;
+        return;
 }
 
 int32_t main() {
