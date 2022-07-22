@@ -7,7 +7,7 @@ using namespace std;
 template<typename A, typename B> ostream& operator<<(ostream &os, const pair<A, B> &p) { return os <<  p.first << " " << p.second ;}
 template<typename T_container, typename T = typename enable_if<!is_same<T_container, string>::value, typename T_container::value_type>::type> ostream& operator<<(ostream &os, const T_container &v) { for (const T &x : v) os << x << " "; return os;}
 void dbg_out() { cerr << "" << endl; }
-template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << H ; dbg_out(T...); }
+template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr << H << " " ; dbg_out(T...); }
 #ifdef SAGAR
 #define dbg(...) cerr << "(" << #__VA_ARGS__ << "):", dbg_out(__VA_ARGS__)
 #else
@@ -17,7 +17,9 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define int long long
 #define pi pair<int,int>
 #define vi vector<int>
+#define vvi vector<vi>
 #define vpi vector<pi>
+#define vvpi vector<vpi>
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 #define rep(i, begin, end) for (__typeof(end) i = (begin) - ((begin) > (end)); i != (end) - ((begin) > (end)); i += 1 - 2 * ((begin) > (end)))
@@ -47,5 +49,7 @@ int32_t main() {
 
     auto stop = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
-    cerr << "Took " << stop - start << "ms" << endl;
+    #ifdef SAGAR
+		cerr << "Took " << stop - start << "ms" << endl;
+	#endif
 }
