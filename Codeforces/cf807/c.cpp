@@ -16,14 +16,41 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 
 #define int long long
 #define pi pair<int,int>
+#define pii pair<int,pi>
 #define vi vector<int>
-#define vpi vector<pi>
+#define vpi vector<pii>
 #define vvpi vector<vpi>
 #define all(x) (x).begin(), (x).end()
 #define rall(x) (x).rbegin(), (x).rend()
 #define rep(i, begin, end) for (__typeof(end) i = (begin) - ((begin) > (end)); i != (end) - ((begin) > (end)); i += 1 - 2 * ((begin) > (end)))
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
+
+char find(int k, int idx, vvpi& arr, vi& pref, string& s, int c, int n){
+    // dbg(k);
+    if(idx == 0){
+        return s[k];
+    }
+    else{
+        //find next index of k
+        int t = 0;
+        for(auto [i, p]: arr[idx]){
+            auto [u,v] = p;
+            if((t + (v-u+1)) > k){
+                //means it belongs here
+                int diff = k - t;
+                int next = diff + u;
+                return find(next, i, arr, pref, s, c, n);
+            }
+            t+= (v-u+1);
+        }
+        // cout << s << endl;
+    }
+    
+    return 0;
+}
+
+
 
 void solve() {
     int n, c,q ; cin >>  n >> c >> q;
@@ -34,95 +61,44 @@ void solve() {
     vvpi arr(c+1); vi pref(c+1,0);
 
     pref[0] = n;
-    arr[0].push_back({0,n-1});
+    arr[0].push_back({0, {0,n-1}});
 
     rep(i,1,c+1){
-        int l, r; cin >> l >> r; l--, r--;
+        int l,r; cin >> l >> r; l--, r--;
+        pref[i] = (r-l+1)+pref[i-1];
 
-        pref[i] = (r-l+1) + pref[i-1];
-
-        //find the pref in which l lies;
+        //find idx in which l lies
         int idx;
-        rep(j,0,i){
+        for(int j=0;j<i;j++){
             if(pref[j]>l){
-                idx =j; 
-                break;
+                idx = j; break;
             }
         }
-
-        // dbg(idx);
-
-
-        // need to insert all 
-        bool filled  = false;
-
-        int p = (idx > 0) ? pref[idx-1] : 0;
-
-        while(p <= r){
-            for(auto [s,e]: arr[idx]){
-                if(p > r) break;
-
-                if(!filled){
-                    if ( p+ (e-s) < l){
-                        p += (e-s+1);
-                    }
-                    else{
-                        int left = s + (l-p);
-
-                        arr[i].push_back({left, s+ min(r-p, e-s)});
-                        p = min(r+1, p+(e-s+1));
-                        filled = true;             
-                    }
-                }
-                else{
-                    if(p + (e-s) >= r){
-                        //we have end here
-                        arr[i].push_back({s, s+ min(r-p, e-s)});
-                        p = min(r+1, p+(e-s+1));
-                        break;
-                    }
-                    else{
-                        arr[i].push_back({s,e});
-                        p+= (e-s+1);
-                    }
-                }
-            }
-            idx++;
+        int curr =l;
+        for(int j=idx;j<i;j++){
+            if(curr >= r) break;
+            int num = (j==0) ? 0 : pref[j-1];
+            arr[i].push_back({j, {max((l-num),0ll), min(r-num, pref[j]-num-1)}});
+            curr = min(r, pref[j]-1);
         }
-        
     }
 
-    dbg(arr);
-    // dbg(str);
     // dbg(pref);
+    // dbg(arr);
 
     rep(i,0,q){
         int k; cin >> k; k--;
         int idx;
-        // dbg(k);
+        rep(j,0,c+1) if(pref[j]>k) {idx =j; break;}
 
-        for(int j=0;j<(c+1);j++){
-            if(pref[j] > k){
-                idx = j;
-                break;
-            }
-        }
-        // dbg(idx);
+        int num = (idx ==0)? 0 : pref[idx-1];
 
-        int start = (idx>0)? pref[idx-1]: 0;
-        for(auto [s,e]: arr[idx]){
-            if(start + (e-s) >= k){
-                //answer lies here
-                dbg(start, s, e, k);
-                cout << str[s + (k-start)] << endl;
-                break;
-            }
-            else{
-                start+=(e-s+1);
-            }
-        }
+        char t = find(k-num, idx, arr, pref, str, c, n);
+
+        cout << t << endl;
     }
-    return;
+
+
 
 }
 

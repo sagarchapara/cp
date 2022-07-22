@@ -88,30 +88,79 @@ class DSU {
     vi parent;
     int n;
 
-    public:
-        DSU (int _n): n(_n){
-            parent.resize(n);
-            iota(all(parent), 0ll);
+public:
+
+    DSU (int _n): n(_n){
+        parent.resize(n);
+        iota(all(parent), 0ll);
+    }
+
+    int find_set(int v) {
+        if (v == parent[v])
+            return v;
+        return parent[v] = find_set(parent[v]);
+    }
+
+    bool check(int u, int v){
+        return find_set(u) != find_set(v);
+    }
+
+    void union_sets(int a, int b) {
+        a = find_set(a);
+        b = find_set(b);
+        if (a != b)
+            parent[b] = a;
+    }
+};
+
+
+//LCA with Binary Lifting
+class LCA{
+    int n, l, timer, root;
+    vector<vector<int>> adj;
+
+    vector<int> tin, tout;
+    vector<vector<int>> up;
+
+    void dfs(int v, int p)
+    {
+        tin[v] = ++timer;
+        up[v][0] = p;
+        for (int i = 1; i <= l; ++i)
+            up[v][i] = up[up[v][i-1]][i-1];
+
+        for (int u : adj[v]) {
+            if (u != p)
+                dfs(u, v);
         }
 
-        ~DSU(){
-            parent.clear();
-        }
+        tout[v] = ++timer;
+    }
 
-        int find_set(int v) {
-            if (v == parent[v])
-                return v;
-            return parent[v] = find_set(parent[v]);
-        }
+    bool is_ancestor(int u, int v)
+    {
+        return tin[u] <= tin[v] && tout[u] >= tout[v];
+    }
 
-        bool check(int u, int v){
-            return find_set(u) != find_set(v);
-        }
+public:
 
-        void union_sets(int a, int b) {
-            a = find_set(a);
-            b = find_set(b);
-            if (a != b)
-                parent[b] = a;
+    int lca(int u, int v)
+    {
+        if (is_ancestor(u, v))
+            return u;
+        if (is_ancestor(v, u))
+            return v;
+        for (int i = l; i >= 0; --i) {
+            if (!is_ancestor(up[u][i], v))
+                u = up[u][i];
         }
+        return up[u][0];
+    }
+
+    LCA (int _n, vector<vector<int>>& _adj, int _root = 0): n(_n), adj(_adj), root(_root){
+        tin.resize(n), tout.resize(n);
+        timer = 0, l = ceil(log2(n));
+        up.assign(n, vector<int>(l + 1));
+        dfs(root, root);
+    }   
 };
