@@ -8,7 +8,7 @@ class SegmentTree{
     int n;
     vector<int> t;
 
-    void build(vector<int>& a, int v, int tl, int tr) {
+    inline void build(vector<int>& a, int v, int tl, int tr) {
         if (tl == tr) {
             t[v] = a[tl];
         } else {
@@ -19,7 +19,7 @@ class SegmentTree{
         }
     }
 
-    int query(int v, int tl, int tr, int l, int r) {
+    inline int query(int v, int tl, int tr, int l, int r) {
         if (l > r) 
             return 0;
         if (l == tl && r == tr) {
@@ -30,7 +30,7 @@ class SegmentTree{
             + query(v*2+1, tm+1, tr, max(l, tm+1), r);
     }
 
-    void update(int v, int tl, int tr, int pos, int new_val) {
+    inline void update(int v, int tl, int tr, int pos, int new_val) {
         if (tl == tr) {
             t[v] = new_val;
         } else {
@@ -50,11 +50,48 @@ public:
         build(arr, 1, 0, n-1);
     }
 
-    int query(int l, int r){
+    inline int query(int l, int r){
         return query(1, 0, n-1, l, r);
     }
 
-    void update(int p, int val){
+    inline void update(int p, int val){
         update(1,0,n-1,p,val);
+    }
+};
+
+//Fenwick tree can also be used to range updates and range queries
+class FenwickTree{
+    int n;
+    vector<int> bit;
+    
+    inline int query(int r) {
+        int ret = 0;
+        for (; r >= 0; r = (r & (r + 1)) - 1){
+            ret += bit[r];
+        }  
+        return ret;
+    }
+
+public:
+
+    FenwickTree(int _n, vector<int>& arr): n(_n){
+        bit.resize(n,0);
+        for(int i=0;i<n;i++){
+            update(i, arr[i]);
+        }
+    }
+
+    FenwickTree(int _n): n(_n){
+        bit.resize(n,0);
+    }
+
+    inline void update(int idx, int delta){
+        for(; idx<n ; idx = (idx | (idx+1))){
+            bit[idx]+=delta;
+        }
+    }
+
+    inline int query(int l, int r){
+        return query(r) - query(l-1);
     }
 };

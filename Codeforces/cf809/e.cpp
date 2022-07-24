@@ -107,8 +107,6 @@ class LCA{
             up.assign(n, vi(l + 1));
             mw.assign(n, vi(l + 1));
             dfs(root, root, 0);
-            // dbg(up);
-            // dbg(mw);
         }   
 };
 
