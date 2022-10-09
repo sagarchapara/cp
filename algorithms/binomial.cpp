@@ -6,9 +6,7 @@ class BinomialCoefficient{
     int n, p;
     vector<int> fact, invf;
 
-
-    int power(int a, int b)
-    {
+    inline int power(int a, int b){
         int res = 1;
         a %= p;
         while (b > 0) 
@@ -21,12 +19,11 @@ class BinomialCoefficient{
         return res;
     }
 
-    int modinv(int k)
-    {
+    inline int modinv(int k){
         return power(k, p-2);
     }
 
-    void compute(){
+    inline void compute(){
         fact[0] = 1;
         for(int i=1;i<n;i++) fact[i] = (i*fact[i-1])%p;
 

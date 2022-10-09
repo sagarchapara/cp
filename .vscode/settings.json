@@ -21,7 +21,8 @@
         "vector": "cpp",
         "initializer_list": "cpp",
         "valarray": "cpp",
-        "condition_variable": "cpp"
+        "condition_variable": "cpp",
+        "*.tcc": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled"
 }
