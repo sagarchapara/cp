@@ -1,127 +1,95 @@
 #include <bits/stdc++.h>
 using namespace std;
 
-#define vi vector<int>
-#define all(x) (x).begin(), (x).end()
-
-/**
-===============================================================
-    Strongly connected components
-================================================================
-**/
-
-vector<vector<int>> adj, adj_rev;
-vector<bool> used;
-vector<int> order, component;
-
-void dfs1(int v, vector<vector<int>>& adj, vector<bool>& used, vector<int>& order) {
-    used[v] = true;
-    for (int u : adj[v]){
-        if (!used[u]){
-            dfs1(u, adj, used, order);
-        }
-    }    
-    order.push_back(v);
-}
-
-void dfs2(int v, vector<vector<int>>& adj_rev, vector<bool>& used, vector<int>& component){
-    used[v] = true;
-    component.push_back(v);
-
-    for (auto u : adj_rev[v]){
-        if (!used[u]){
-            dfs2(u, adj_rev, used, component);
-        }
-    }     
-}
-
-// int main() {
-//     int n;
-//     // ... read n ...
-//      
-//     adj.resize(n); adj_rev.resize(n);   
-//
-//     for (;;) {
-//         int a, b;
-//         // ... read next directed edge (a,b) ...
-//         adj[a].push_back(b);
-//         adj_rev[b].push_back(a);
-//     }
-
-//     used.assign(n, false);
-
-//     for (int i = 0; i < n; i++)
-//         if (!used[i])
-//             dfs1(i);
-
-//     used.assign(n, false);
-//     reverse(order.begin(), order.end());
-
-//     for (auto v : order)
-//         if (!used[v]) {
-//             dfs2 (v);
-
-//             // ... processing next component ...
-
-//             component.clear();
-//         }
-// }
-
-
-/**
-===============================================================
-    Floyd Warshall (shortest distance between all vertices)
-================================================================
-**/
-
-// for (int k = 0; k < n; ++k) {
-//     for (int i = 0; i < n; ++i) {
-//         for (int j = 0; j < n; ++j) {
-//             if (d[i][k] < INF && d[k][j] < INF)
-//                 d[i][j] = min(d[i][j], d[i][k] + d[k][j]); 
-//         }
-//     }
-// }
-
-//DSU
-class DSU {
-    vi parent;
-    int n;
-
+class FindCyclesInDAG{
 public:
+    int n;
+    vector<vector<int>> adj;
+    vector<int> color;
 
-    DSU (int _n): n(_n){
-        parent.resize(n);
-        iota(all(parent), 0ll);
+    bool dfs(int curr, int par){
+        color[curr] = 1;
+
+        for(int next: adj[curr]){
+            if(next != par){
+                if(color[next] == 0){
+                    if(dfs(next, curr)) return true;
+                }
+                else if(color[next] == 1){
+                    return true;
+                }
+            }
+        }
+        color[curr] = 2;
+        return false;
     }
 
-    int find_set(int v) {
-        if (v == parent[v])
-            return v;
-        return parent[v] = find_set(parent[v]);
-    }
+    bool hasCycle(int n, vector<vector<int>>& adj){
+        vector<int> color(n, 0);
 
-    bool check(int u, int v){
-        return find_set(u) != find_set(v);
-    }
-
-    void union_sets(int a, int b) {
-        a = find_set(a);
-        b = find_set(b);
-        if (a != b)
-            parent[b] = a;
+        for(int i=0;i<n;i++){
+            if(color[0] == 0){
+                if(dfs(i, -1)) return true;
+            }
+        }
     }
 };
 
+class DSU {
+public:
+    int n;
+    vector<int> parent;
+    vector<int> size;
 
-//LCA with Binary Lifting
+    DSU(int _n) : n(_n) {
+        parent.resize(n);
+        size.resize(n, 1);
+        iota(parent.begin(), parent.end(), 0ll);
+    }
+
+    int find_set(int k) {
+        if (parent[k] == k) {
+            return k;
+        }
+        return parent[k] = find_set(parent[k]);
+    }
+
+    void merge(int a, int b) {
+        a = find_set(a);
+        b = find_set(b);
+
+        if (a != b) {
+            if (size[a] < size[b]) {
+                swap(a, b);
+            }
+            parent[b] = a;
+            size[a] += size[b];
+        }
+    }
+
+    int find_size(int a) { return size[find_set(a)]; }
+};
+
+
 class LCA{
-    int n, l, timer, root;
+private:
+    int n, l;
     vector<vector<int>> adj;
 
+    int timer;
     vector<int> tin, tout;
     vector<vector<int>> up;
 
+    LCA(int _n, vector<vector<int>>& _adj) : n(_n), adj(_adj)
+    {
+        tin.resize(n);
+        tout.resize(n);
+        timer = 0;
+        l = ceil(log2(n));
+        up.assign(n, vector<int>(l + 1));
+        dfs(0, 0);
+    }
+    
     void dfs(int v, int p)
     {
         tin[v] = ++timer;
@@ -142,8 +110,6 @@ class LCA{
         return tin[u] <= tin[v] && tout[u] >= tout[v];
     }
 
-public:
-
     int lca(int u, int v)
     {
         if (is_ancestor(u, v))
@@ -156,11 +122,4 @@ public:
         }
         return up[u][0];
     }
-
-    LCA (int _n, vector<vector<int>>& _adj, int _root = 0): n(_n), adj(_adj), root(_root){
-        tin.resize(n), tout.resize(n);
-        timer = 0, l = ceil(log2(n));
-        up.assign(n, vector<int>(l + 1));
-        dfs(root, root);
-    }   
 };

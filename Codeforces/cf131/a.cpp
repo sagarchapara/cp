@@ -1,6 +1,8 @@
 // g++ -o out <filename>.cpp -D SAGAR
 // .\out.exe
 
+#define SAGAR
+
 #include <bits/stdc++.h>
 using namespace std;                                    
 
@@ -24,22 +26,79 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-void solve() {
-    
-}
+
+
+class Edge {
+public:
+    int dist;
+    int idx;
+    int num;
+
+    Edge(int dist, int num, int idx) : dist(dist), num(num), idx(idx){};
+
+    bool operator<(const Edge& other) const {
+        return dist > other.dist;
+    }
+};
+
+class Solution {
+public:
+    int findCheapestPrice(int n, vector<vector<int>>& points, int src, int dst, int k) {
+        vector<vector<pair<int, int>>> adjL(n);
+
+        for (const vector<int>& vv : points) {
+            int u = vv[0];
+            int v = vv[1]; 
+            int w = vv[2];
+            adjL[u].push_back({v, w});
+        }
+
+        priority_queue<Edge> pq;
+
+        pq.emplace(0, -1, src);
+
+        while (!pq.empty()) {
+            const Edge curr = pq.top();
+            pq.pop();
+
+            if (curr.num > k)
+                continue;
+
+            if (curr.idx == dst) {
+                return curr.dist;
+            }
+
+            if (curr.num == k)
+                continue;
+
+            for (const auto& [u, w] : adjL[curr.idx]) {
+                int next_dist = curr.dist + w;
+                pq.emplace(next_dist, curr.num + 1, u);
+            }
+        }
+
+        // finally return -1
+        return - 1;
+    }
+};
+ 
 
 int32_t main() {
-    #ifdef SAGAR
-        freopen("input.txt", "r", stdin);
-        // freopen("output.txt", "w", stdout);
-    #else
-        ios_base::sync_with_stdio(0);
-        cin.tie(0); cout.tie(0);
-    #endif
+    Solution solution;
 
-    int tc = 1;
-    // cin >> tc;
-    for (int t = 1; t <= tc; t++) {
-        solve();
+    int n = 5;
+    vector<vector<int>> points = {{0, 1, 100}, {1, 2, 200}, {2, 0, 100}, {1, 3, 600}, {2, 3, 200}};
+    int src = 0;
+    int dst = 3;
+    int k = 1;
+
+    int result = solution.findCheapestPrice(n, points, src, dst, k);
+
+    if (result != -1) {
+        std::cout << "The cheapest price from " << src << " to " << dst << " with at most " << k << " stops is: " << result << std::endl;
+    } else {
+        std::cout << "There is no valid path from " << src << " to " << dst << " with at most " << k << " stops." << std::endl;
     }
+
+    return 0;
 }
