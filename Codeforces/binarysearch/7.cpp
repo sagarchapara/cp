@@ -26,8 +26,105 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool is_good(int t, int d, int n, int m, vector<vector<pair<int,int>>>& adj, vector<int>& parent){
+    vector<bool> visited (n, false);
+
+    visited[0] = true;
+    parent[0] = 0;
+
+    queue<pair<int, int>> q;
+
+    q.push({0,0});
+    
+    while (!q.empty())
+    {
+        auto curr = q.front();
+        q.pop();
+
+        if(curr.second > d){
+            return false;
+        }
+
+        if(curr.first == n-1){
+            if(curr.second <= d){
+                return true;
+            }
+        }
+
+        for(auto& next: adj[curr.first]){
+            if(next.second <= t){
+                if(!visited[next.first]){
+                    visited[next.first] = true;
+                    q.push({next.first, curr.second+1});
+                    parent[next.first] = curr.first;
+                }
+            }
+        }
+    }
+
+    return false;
+    
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m ,d;
+    cin >> n >> m >> d;
+
+    vector<vector<pair<int,int>>> adj(n);
+
+    vector<int> parent(n);
+
+    int l = 0;
+    int r = 0;
+
+    for(int i=0;i<m;i++){
+        int u, v, w;
+        cin >> u >> v >> w; u--; v--;
+
+        r = max(r, w);
+
+        if(u > v) swap(u,v);
+
+        adj[u].push_back({v, w});
+    }
+
+    while (r-l>1)
+    {
+        int mid = (l+r+1)/2;
+        if(is_good(mid, d, n, m, adj, parent)){
+            r = mid;
+        }
+        else{
+            l = mid+1;
+        }
+    }
+
+    for(int i=l;i<=r;i++){
+        if(is_good(i,d,n,m,adj,parent)){
+            vector<int> ans;
+
+            int curr = n-1; ans.push_back(curr);
+
+            while (curr != 0)
+            {
+                curr = parent[curr];
+                ans.push_back(curr);
+            }
+
+            cout << (ans.size()-1) << endl;
+
+            for(int j = ans.size()-1;j>=0;j--){
+                cout << (ans[j]+1) << " ";
+            }
+
+            cout << endl;
+
+            return;
+        }
+    }
+
+    cout << -1 << endl;
+    
 }
 
 int32_t main() {

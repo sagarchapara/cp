@@ -25,9 +25,69 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(i, begin, end) for (__typeof(end) i = (begin) - ((begin) > (end)); i != (end) - ((begin) > (end)); i += 1 - 2 * ((begin) > (end)))
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
+#define double long double
+
+bool is_good(double mean, int n, int d, vector<int>& arr, pair<int, int>& range){
+    dbg(mean);
+
+    double sum = 0;
+
+    vector<pair<double, int>> pref_sum(n);
+
+    for(int i=0;i<n;i++){
+        sum += (double)(arr[i] - mean);
+
+        if(i>=d && sum >= pref_sum[i-d].first){
+            range = {pref_sum[i-d].second+1, i};
+
+            dbg(pref_sum);
+
+            dbg(range);
+
+            return true;
+        }
+
+        pref_sum[i] = {sum, i};
+
+        if(i>0 && sum >= pref_sum[i-1].first){
+            pref_sum[i] = pref_sum[i-1];
+        }
+    }
+
+    return false;
+}
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, d;
+    cin >> n >> d;
+
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    double l = 0;
+    double r = 1e5;
+
+    pair<int, int> range;
+
+    for(int i=0;i<100;i++){
+        double mid = (double)(l+r)/2.0;
+
+        if(is_good(mid, n, d, arr, range)){
+            l = mid;
+        }
+        else{
+            r = mid;
+        }
+    }
+
+    dbg(l);
+
+    assert(true  == is_good(l, n,d ,arr, range));
+
+    cout << (range.first+1) << " " << (range.second+1) << endl;
 }
 
 int32_t main() {

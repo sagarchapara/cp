@@ -26,8 +26,51 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+int binary_search(int k, vector<int>& arr){
+    int l = 0;
+    int r = arr.size()-1;
+
+    while (r-l>1)
+    {
+        dbg(l, r);
+
+        int mid = (l+r+1)/2;
+
+        if(arr[mid]>k){
+            r = mid-1;
+        }
+        else{
+            l = mid;
+        }
+    }
+
+    for(int i =r;i>=l;i--){
+        if(arr[i] <= k){
+            return i+1;
+        }
+    }
+
+    return 0;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k;
+
+    cin >> n >> k;
+
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    for(int i=0;i<k;i++){
+        int num; cin >> num;
+
+        int idx = binary_search(num, arr);
+
+        cout << idx << endl;
+    }   
 }
 
 int32_t main() {

@@ -26,8 +26,78 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool is_good(int max_sum, int n, int k, vector<int>& arr){
+    int sum = 0, cnt  =1;
+
+    for(int i=0;i<n;i++){
+        if(arr[i]+sum > max_sum){
+            sum = arr[i];
+            cnt+=1;
+        }
+        else{
+            sum+=arr[i];
+        }
+    }
+
+    dbg(max_sum, cnt, k);
+
+    if(cnt <= k) return true;
+
+    sum =0, cnt =1;
+
+    //repeat same from back
+    for(int i=n-1;i>=0;i--){
+        if(arr[i]+sum > max_sum){
+            sum = arr[i];
+            cnt+=1;
+        }
+        else{
+            sum+=arr[i];
+        }
+    }
+
+    dbg(max_sum, cnt, k);
+
+    if( cnt <= k) return true;
+
+    return false;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k;
+    cin >> n >> k;
+
+    vector<int> arr(n);
+
+    int l = 0;
+    int r = 0;
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+        l = max(l, arr[i]);
+        r += arr[i];
+    }
+
+    while (r-l>1)
+    {
+        int mid = (l+r+1)/2;
+
+        dbg(l, r);
+
+        if(is_good(mid, n, k, arr)){
+            r = mid;
+        }
+        else{
+            l = mid+1;
+        }
+    }
+
+    for(int i=l;i<=r;i++){
+        if(is_good(i, n, k, arr)){
+            cout << i << endl;
+            return;
+        }
+    }
 }
 
 int32_t main() {

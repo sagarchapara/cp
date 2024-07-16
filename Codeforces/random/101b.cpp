@@ -26,8 +26,55 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+#define MOD 1000000007
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m; 
+    cin >> n >> m;
+
+    vector<pair<int, int>> line;
+
+    for(int i=0; i<m; i++) {
+        int x, y; 
+        cin >> x >> y;
+        line.push_back({y, 0});
+        line.push_back({x, 1});
+        line.push_back({x-1, 2});
+    }
+
+    sort(line.begin(), line.end());
+
+    map<int, int> dp;
+    int sum = 0;
+
+    int l = line.size();
+
+    int last_removed = -1;
+
+    for(int i=l-1; i>=0; i--) {
+        auto& p = line[i];
+
+        if(p.first == n) {
+            sum += 1;
+        }
+        else if(p.second == 0) {
+            sum = (2 * sum) % MOD;
+            last_removed = -1;
+        }
+        else if(p.second == 1) {
+            dp[p.first] = sum;
+            last_removed = -1;
+        }
+        else {
+            if(p.first + 1 == last_removed) {
+                continue;
+            }
+            sum = (sum - dp[p.first+1] + MOD) % MOD;       
+            last_removed = p.first+1;     
+        }
+    }
+
+    cout << dp[0] << endl;
 }
 
 int32_t main() {

@@ -27,7 +27,38 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    long double ans = 0;
+
+    for(int i=1;i<n;i++){
+        for(int j=0;j<i;j++){
+            long double comp =  0;
+
+            //choose j, such that arr[j] > arr[i]
+            for(int k = 1;k<=arr[i];k++){
+                //find number from k+1 to arr[j];
+
+                if(k+1 > arr[j]) break;
+
+                long double val = (long double)(arr[j] - k)/(long double)arr[j];
+
+                comp += val;
+            }
+
+            comp = comp / (long double)arr[i];
+
+            ans += comp;
+        }
+    }
+
+    cout << fixed << setprecision(6) << ans << endl;
 }
 
 int32_t main() {

@@ -27,7 +27,30 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+
+    vector<int> arr;
+
+    for(int i=0;(1<<i)<=n;i++){
+        if(n & (1<<i)){
+            if(n != (1<<i)){
+                arr.push_back(i);
+            }
+        }
+    }
+
+    reverse(all(arr));
+
+    cout << (arr.size()+1) << endl;
+
+    for(int i=0;i<arr.size();i++){
+        int val = (1<<(arr[i]));
+        val = n - val;
+
+        cout << val << " ";
+    }
+
+    cout << n << endl;
 }
 
 int32_t main() {
@@ -42,7 +65,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

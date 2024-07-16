@@ -26,8 +26,48 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool check(int n, int a[], int b[]){
+    for(int i=0;i<n;i++){
+        if(a[i] > b[i]){
+            return false;
+        }
+    }
+
+    return true;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m;
+    cin >> n >> m;
+
+    string s; cin >> s;
+
+    string ch; cin >> ch;
+
+    int cards[26] ={0};
+
+    for(char c: ch){
+        cards[c-'a']++;
+    }
+
+    int ans = 0;
+
+    int curr[26] = {0};
+
+    int l =0;
+
+    for(int r=0;r<n;r++){
+        curr[s[r]-'a']++;
+
+        while(l<r && !check(n, curr, cards)){
+            curr[s[l]-'a']--;
+            l++;
+        }
+
+        ans += (r-l+1);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

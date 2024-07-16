@@ -26,8 +26,85 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+vector<int> precompute_cost(int n, vector<vector<int>>& arr){
+    vector<int> cost((1<<n));
+
+    cost[0] = 0;
+
+    for(int mask = 1; mask<(1<<n);mask++){
+        int last_bit = mask & (-mask);
+
+        int num = __builtin_ffs(last_bit) -1 ;
+
+        int ans = 0;
+
+        int sub_mask = (mask & (mask-1));
+
+        for(int i=0;i<n;i++){
+            if(sub_mask & (1<<i)){
+                ans += arr[i][num];
+            }
+        }
+
+        cost[mask] = cost[mask ^ last_bit] + ans;
+    }
+
+    return cost;
+}
+
+int dfs(int n, int curr_mask, vector<int>& dp, vector<int>& cost){
+
+    // dbg(n, curr_mask);
+
+    //go through all submasks of curr_maks
+    if(curr_mask >= (1<<n)){
+        return 0;
+    }
+
+    if(dp[curr_mask] != -1){
+        return dp[curr_mask];
+    }
+
+    if(curr_mask == 0){
+        return dp[curr_mask] = 0;
+    }
+
+    int ans = cost[curr_mask];
+
+    //go through all submasks of curr_mask
+    for(int s=curr_mask; s!=0; s= curr_mask&(s-1)){
+
+        if( s == curr_mask) continue;
+
+        int val = dfs(n,s,dp,cost) + dfs(n, curr_mask^s, dp, cost);
+
+        ans = max(ans, val);
+    }
+
+    return dp[curr_mask] = ans;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+    vector<vector<int>> arr(n, vector<int>(n));
+
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin >> arr[i][j];
+        }
+    }
+
+    vector<int> dp(1<<n, -1), cost(1<<n, 0);
+
+    cost = precompute_cost(n, arr);
+
+    // dbg(cost);
+
+    int ans = dfs(n, (1<<n)-1, dp, cost);
+
+    // dbg(dp);
+
+    cout << ans << endl;
 }
 
 int32_t main() {

@@ -26,8 +26,87 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool is_good(int g, int k, int n, vector<int>& arr){
+    map<int, int> remaining;
+
+    remaining[k] = g;
+
+    for(int i=0;i<n;i++){
+        int used = 0;
+
+        map<int, int> should_use;
+
+        for(auto itr = remaining.rbegin(); itr!= remaining.rend(); ++itr){
+            int can_use = min(itr->second, arr[i]-used);
+
+            if(can_use == 0){
+                break;
+            }
+
+            //update 
+            should_use[itr->first] =can_use;
+            used+= can_use;
+        }
+
+        //now update those
+        for(auto itr = should_use.rbegin(); itr != should_use.rend(); ++itr){
+            //update the remaining map
+            remaining[itr->first] -= should_use[itr->first];
+
+            if(itr->first > 1){
+                remaining[itr->first -1 ]+= should_use[itr->first];
+            }
+
+            if(remaining[itr->first] == 0){
+                remaining.erase(itr->first);
+            }
+        }
+    }
+
+    if(remaining.size() == 0){
+        return true;
+    }
+    
+    return false;
+
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int k, n;
+
+    cin >> k >> n;
+
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    sort(arr.begin(), arr.end(), std::greater<int>());
+
+    int l = 0;
+    int r = 1e18;
+
+    while(r-l>1){
+        int mid = (l+r)/2;
+
+        if(is_good(mid, k, n, arr)){
+            l = mid;
+        }
+        else{
+            r = mid-1;
+        }
+    }
+
+    for(int i=r;i>=l;i--){
+        if(is_good(i,k,n,arr)){
+            cout << i << endl;
+
+            return;
+        }
+    }
+
+    cout << 0 << endl;
 }
 
 int32_t main() {

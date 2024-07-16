@@ -27,7 +27,35 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m;
+
+    cin >> n >> m;
+
+    vector<int> a(n), b(m), ans(m);
+
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+    }
+
+    for(int j=0;j<m;j++){
+        cin >> b[j];
+    }
+
+    dbg(a, b);
+
+    int i =0, j = 0, prev =0;
+
+    while(j<m){
+        //move i right as long as arr[i] >= arr[j]
+        while(i<n && a[i] < b[j]){
+            i++;
+        }
+
+        ans[j] = i;
+
+        cout << ans[j] << " ";
+        j++;
+    }
 }
 
 int32_t main() {

@@ -26,8 +26,52 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool is_good(int d, int n, int k, vector<int>& arr){
+    int num = 1;
+    int curr = arr[0];
+
+    for(int i=1;i<n;i++){
+        if(arr[i] - curr >= d){
+            num+=1;
+            curr = arr[i];
+        }
+    }
+
+    return num >= k; 
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k;
+
+    cin >> n >> k;
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    int l = 1;
+    int r = arr[n-1] - arr[0];
+
+    while(r-l>1){
+        int mid = (l+r)/2;
+
+        if(is_good(mid, n, k, arr)){
+            l = mid;
+        }
+        else{
+            r = mid-1;
+        }
+    }
+
+    for(int i=r;i>=l;i--){
+        if(is_good(i, n, k, arr)){
+            cout << i << endl;
+
+            return;
+        }
+    }
+
 }
 
 int32_t main() {

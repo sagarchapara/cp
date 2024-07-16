@@ -27,7 +27,40 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k;
+
+    cin >> n >> k;
+
+    vector<int> c(n), w(n);
+
+    for(int i=0;i<n;i++){
+        cin >> w[i];
+    }
+
+    for(int i=0;i<n;i++){
+        cin >> c[i];
+    }
+
+    int cost = 0; int l =0;
+
+    int curr = 0, sum =0;
+
+    for(int r=0;r<n;r++){
+        curr += c[r];
+        sum += w[r];
+
+        while(l<n && sum > k){
+            sum-=w[l];
+            curr-=c[l];
+            l++;
+        }
+
+        if(sum <= k){
+            cost = max(cost, curr);
+        }
+    }
+
+    cout << cost << endl;
 }
 
 int32_t main() {

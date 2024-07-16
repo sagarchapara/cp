@@ -27,7 +27,48 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    string s;
+    cin >> s;
+
+    int n = s.size();
+
+    int dp[n][n];
+    bool isPalindrome[n][n];
+
+    memset(dp, 0, sizeof(dp));
+    memset(isPalindrome, false, sizeof(isPalindrome));
+
+    for(int i=0;i<n;i++){
+        dp[i][i] = 1;
+        isPalindrome[i][i] = true;
+    }
+
+    for(int len=1;len<n;len++){
+        for(int i=0;i+len<n;i++){
+            int j = i + len;
+
+            if(len == 1){
+                isPalindrome[i][j] = (s[i] == s[j]);
+            }
+            else{
+                isPalindrome[i][j] = isPalindrome[i+1][j-1] && (s[i] == s[j]);
+            }
+
+            dp[i][j] = dp[i+1][j] + dp[i][j-1] - dp[i+1][j-1] + (isPalindrome[i][j] ? 1 : 0);
+
+            dbg(i, j, dp[i][j], dp[i+1][j], dp[i][j-1], dp[i+1][j-1]);
+        }
+    }
+
+    int q; cin >> q;
+
+    while (q--)
+    {
+        int l, r; cin >> l >> r; l--, r--;
+
+        cout << dp[l][r] << endl;
+    }
+    
 }
 
 int32_t main() {

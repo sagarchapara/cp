@@ -26,8 +26,80 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+pair<int, int> dfs(
+    string& curr,
+    map<string, string>& mp, 
+    map<string, pair<int, int>>& cnt){
+ 
+    auto itr = cnt.find(curr);
+    if(itr != cnt.end()){
+        return itr->second;
+    }
+
+    int r = 0;
+
+    for(char& c: curr){
+        if(c == 'r'){
+            r++;
+        }
+    }
+
+    pair<int,int> ans = {r, curr.size()};
+    cnt[curr] = ans;
+
+    auto mItr = mp.find(curr);
+
+    if(mItr != mp.end()){
+        //you have something
+        auto next = dfs(mItr->second, mp, cnt);
+
+        if(next < ans){
+            ans = next;
+        }
+    }
+
+    cnt[curr] = ans;
+
+    return ans;
+}
+
+void to_lower(string& s){
+    std::transform(s.begin(), s.end(), s.begin(), [](unsigned char c){ return std::tolower(c); });
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int m, n; cin >> m;
+
+    vector<string> arr(m);
+
+    for(int i=0;i<m;i++){
+        cin >> arr[i];
+        to_lower(arr[i]);
+    }
+
+    cin >> n;
+    map<string, string> mp;
+
+    for(int i=0;i<n;i++){
+        string a, b; cin >> a >> b;
+        to_lower(a); to_lower(b);
+        mp[a] = b;
+    }
+
+    map<string, pair<int, int>> cnt;
+
+    int sz = 0, r =0;
+
+    for(int i =0;i<m;i++){
+        auto p = dfs(arr[i], mp, cnt);
+
+        dbg(arr[i], p);
+
+        sz += p.second;
+        r += p.first;
+    }
+
+    cout << r << " " << sz << endl;
 }
 
 int32_t main() {

@@ -26,8 +26,37 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+const int MOD = 1e9+7;
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+    vector<vector<int>> arr(n, vector<int>(n));
+
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin >> arr[i][j];
+        }
+    }
+
+    vector<vector<int>> dp((n), vector<int>(1<<n, 0));
+
+    for(int mask = 0; mask < (1<<n); mask++){
+        int i = __builtin_popcount(mask) - 1;
+        for(int j=0;j<n;j++){
+            if(i == 0){
+                if((mask == (1<<j)) && arr[i][j]){
+                    dp[i][mask] +=1;
+                }
+            }
+            else{
+                if((mask & (1<<j)) && arr[i][j]){
+                    dp[i][mask] = (dp[i][mask] + dp[i-1][mask^(1<<j)])%MOD;
+                }
+            }
+        }
+    }
+
+    cout << dp[n-1][(1<<n)-1] << endl;
 }
 
 int32_t main() {

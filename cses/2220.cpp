@@ -26,8 +26,61 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+int dp[20][11][2];
+
+int num_values(string& s, int curr, int prev, int tight){
+    if(curr  == s.size()){
+        return 1;
+    }
+
+    if(dp[curr][prev][tight] != -1){
+
+        dbg(s, curr, prev, tight, dp[curr][prev][tight]);
+
+        return dp[curr][prev][tight];
+    }
+
+    //now number of ways for current digit
+    int d = s[curr] - '0';
+
+    dbg(d);
+
+    int ans = 0;
+
+    int limit = tight ? d : 9;
+
+    for(int i=limit;i>=0;--i){
+        if(i != prev){
+            ans += num_values(s, curr+1, i, tight && (i==d));
+        }
+    }
+
+    return dp[curr][prev][tight] = ans;
+}
+
+int count_values(int num) {
+    string s = to_string(num);
+
+    dbg(s);
+
+    memset(dp, -1, sizeof(dp));
+    return num_values(s, 0, 10, 1);
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int l, r;
+
+    cin >> l >> r;
+
+    dbg(count_values(r), r);
+
+    dbg(count_values(l-1), l-1);
+
+    dbg(count_values(10), count_values(9));
+
+    int ans = count_values(r) - count_values(l-1);
+    
+    cout << ans << endl;
 }
 
 int32_t main() {

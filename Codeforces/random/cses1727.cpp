@@ -26,8 +26,43 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+long double power(long double x, int y){
+    long double ans = 1.0;
+
+    while(y > 0){
+        if(y&1){
+            ans = ans * x;
+        }
+
+        x = x * x;
+        y >> 1;
+    }
+
+    return ans;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k; cin >> n >> k;
+
+    long double ans = 0;
+
+    for(int i=1;i<=k;i++){
+        long double num1 = (long double)(i)/(long double)k;
+
+        long double num2 = 0;
+
+        if(i > 0){
+          num2 = (long double)(i-1)/(long double)k;
+        }
+
+        long double val1 = pow(num1, n);
+
+        long double val2 = pow(num2, n);
+
+        ans += (long double) (i) * (val1 - val2);
+    }
+
+    cout << fixed << setprecision(6) << ans << endl;
 }
 
 int32_t main() {

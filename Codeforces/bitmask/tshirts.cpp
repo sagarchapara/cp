@@ -26,8 +26,68 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+const int MOD = 1e9+7;
+
+vector<int> get_nums(string& s) {
+    vector<int> nums;
+    stringstream ss(s);
+    string num_str;
+    while (ss >> num_str) {
+        nums.push_back(stoi(num_str));
+    }
+    return nums;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+    cin.ignore();
+
+    vector<vector<int>> tshirtMap(100);
+
+    for(int i=0;i<n;i++){
+        string s;
+
+        std::getline(std::cin, s);
+
+        dbg(s);
+
+        //split the string into nums
+        vector<int> nums = get_nums(s);
+        for(int num: nums){
+            tshirtMap[num-1].push_back(i);
+        }
+
+        dbg(i, nums);
+    }
+
+    dbg(tshirtMap);
+
+    vector<vector<int>> dp((1<<n), vector<int>(100, 0));
+
+    for(int i=0;i<100;i++){
+        dp[0][i] = 1;
+    }
+
+    for(int mask = 1; mask<(1<<n);mask++){
+        for(int i=0;i<100;i++){
+            if(i > 0){
+                dp[mask][i] = (dp[mask][i] + dp[mask][i-1])%MOD; 
+            }
+
+            for(int u: tshirtMap[i]){
+                if(i == 0){
+                    if(mask == (1<<u)){
+                        dp[mask][i]  = (1+dp[mask][i])%MOD;
+                    }
+                }
+                else{
+                    dp[mask][i] = (dp[mask][i] + dp[mask^(1<<u)][i-1])%MOD;
+                }
+            }
+        }
+    }
+
+    cout << dp[(1<<n)-1][99] << endl;
 }
 
 int32_t main() {
@@ -42,7 +102,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

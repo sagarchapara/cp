@@ -26,8 +26,59 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+bool num_elems(int target, int n, int k, vector<int>& a, vector<int>& b){
+    int sum = 0;
+
+    for(int i=0;i<n;i++){
+        int curr = (target-1)-a[i];
+
+        //number of elems <= curr
+        auto itr = upper_bound(b.begin(), b.end(), curr);
+
+        int val = (itr - b.begin());
+
+        sum += val;
+    }
+
+    return sum < k;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n , k ; cin >> n >> k;
+
+    vector<int> a(n), b(n);
+
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+    }
+
+    for(int i=0;i<n;i++){
+        cin >> b[i];
+    }
+
+    sort(b.begin(), b.end());
+
+    int l = 1;
+    int r = 2e9;
+
+    while (l<r)
+    {
+        int mid = (l+r+1)/2;
+
+        if(num_elems(mid, n, k, a, b)){
+            //if this is true and mid+1 is false the ans is mid
+            if(!num_elems(mid+1, n, k, a, b)){
+                cout << mid << endl;
+                return;
+            }
+            l = mid + 1;
+        }
+        else{
+            r = mid - 1;
+        }
+    }
+
+    cout << l << endl;
 }
 
 int32_t main() {

@@ -26,8 +26,90 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+struct Interval
+{
+    int start;
+    int end;
+    int cost;
+    Interval(int s, int e, int c): start(s), end(e), cost(c){}
+};
+
+
 void solve() {
     int n, m; cin >> n >> m;
+
+    vector<int> cnt(n+1, 0);
+
+    vector<Interval> intervals;
+
+    map<int, vector<pair<int, int>>> pos;
+
+    for(int i=0;i<m;i++){
+        int x, y, c; cin >> x >> y >> c;
+
+        cnt[x]+=c;
+
+        if(y+1 <= n){
+            cnt[y+1]-=c; 
+        }
+
+        Interval itr(x, y, c);
+
+        intervals.push_back(itr);
+
+        pos[x-1].push_back({i, -1});
+        pos[y].push_back({i,1});
+    }
+
+    for(int i=1;i<=n;i++){
+        cnt[i]+= cnt[i-1];
+    }
+
+    dbg(cnt);
+
+    //let's sort the intervals
+    vector<int> dp (n+1, 0);
+
+    set<pair<int, int>> max_right;
+
+    int ans =0;
+
+    for(int i=n;i>=0;i--){
+        for(auto& p : pos[i]){
+            if(p.second == 1){
+                //insert into set
+                max_right.insert({intervals[p.first].end, p.first});
+            }
+            else{
+                max_right.erase({intervals[p.first].end, p.first});
+            }
+
+            if(i == n){
+                dp[i] = cnt[i];
+                continue;
+            }
+
+            dp[i] = dp[i+1];
+
+            if(max_right.size() == 0){
+                continue;
+            }
+
+            int right = max_right.rbegin()->first;
+
+            int val = cnt[i];
+
+            if(right + 1 <= n){
+                val += dp[right+1];
+            }
+
+            dp[i] = max(val, dp[i]);
+        }
+
+        ans = max(ans, dp[i]);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

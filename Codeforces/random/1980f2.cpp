@@ -26,8 +26,54 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+class SegmentTree{
+
+private:
+    int n;
+    vector<pair<int, int>> segTree;
+
+    void build(vector<pair<int, int>>& arr, int l, int r, int tl, int tr){
+        
+    }
+
+
+
+public:
+
+    SegmentTree(int _n, vector<pair<int, int>>& arr) : n(_n) 
+    {
+        segTree.resize(4*n);
+
+
+    }    
+
+    pair<int,int> query(){
+
+    }
+
+
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m, k;
+    cin >> n >> m >> k;
+
+    vector<pair<int, int>> arr(k);
+    map<int, set<pair<int,int>>> grid;
+
+    for(int i=0;i<k;i++){
+        int r,c;
+
+        cin >> r >> c;
+
+        arr[i] = {r,c};
+
+        grid[c].insert({r, i});
+    }
+
+
+
+
 }
 
 int32_t main() {
@@ -42,7 +88,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

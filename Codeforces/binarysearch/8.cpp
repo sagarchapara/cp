@@ -25,9 +25,55 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define rep(i, begin, end) for (__typeof(end) i = (begin) - ((begin) > (end)); i != (end) - ((begin) > (end)); i += 1 - 2 * ((begin) > (end)))
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
+#define double long double
+
+bool is_good(double d, int n, int k, vector<int>& a, vector<int>& b){
+    double sum =0;
+
+    vector<double> arr(n);
+
+    for(int i=0;i<n;i++){
+        arr[i] = (double)a[i]*1.0 - (double)d*1.0*b[i];
+    }
+
+    dbg(arr);
+
+    sort(arr.begin(), arr.end(), greater<double>());
+
+    for(int i=0;i<k;i++){
+        sum += arr[i];
+    }
+
+    dbg(d, sum, k);
+
+    return (sum >=0.0);
+}
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k;
+    cin >> n >> k;
+
+    vector<int> a(n), b(n);
+
+    for(int i=0;i<n;i++){
+        cin >> a[i] >> b[i];
+    }
+
+    double l = 0;
+    double r = 1e5+1;
+
+    for(int i=0;i<100;i++){
+        double mid = (double)(l+r)/(double)2.0;
+
+        if(is_good(mid, n, k, a, b)){
+            l = mid;
+        }
+        else{
+            r = mid;
+        }
+    }
+
+    cout << fixed << setprecision(7) << l << endl;
 }
 
 int32_t main() {

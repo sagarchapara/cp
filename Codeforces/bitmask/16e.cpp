@@ -27,7 +27,46 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+
+    double arr[n][n];
+
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            cin >> arr[i][j];
+        }
+    }
+
+    vector<double> dp((1<<n), 0);
+
+    dp[(1<<n)-1] = (n*(n+1));
+
+    for(int i=(1<<n)-1;i>0;i--){
+        int num = __builtin_popcount(i);
+
+        dp[i] = (dp[i]*1.0)/((num+1));
+
+        dp[i] = dp[i]/num;
+
+        for(int j=0;j<n;j++){
+            if((i & (1<<j)) == 0) continue;
+            for(int k=0;k<n;k++){
+                if(k!=j && (i & (1<<k))){
+                    dp[i^(1<<j)] += ((dp[i]) * arr[k][j]);
+                    dp[i^(1<<k)] += (dp[i] * arr[j][k]);
+
+                    dbg(i, j, k, dp[i^(1<<j)], dp[i^(1<<k)], dp[i]);
+                }
+            }
+        }
+    }
+
+
+    for(int i=0;i<n;i++){
+        cout << fixed<< setprecision(7) << dp[(1<<i)] << " ";
+    }
+
+    cout << endl;
 }
 
 int32_t main() {

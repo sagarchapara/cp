@@ -26,8 +26,82 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+#define MAX_NUM 2
+
+class Trie{
+
+    struct Node{
+        bool isRoot;
+        int child[MAX_NUM];
+        bool isEnd;
+
+        Node(bool _isRoot, bool _isEnd): isRoot(_isRoot), isEnd(_isEnd){
+            for(int i=0;i<MAX_NUM;i++){
+                child[i] = -1;
+            }
+        }
+    };
+
+    vector<Node> nodes;
+
+public:
+    Trie(){
+        nodes.emplace_back(true, false);
+    }
+
+    int add(string& s){
+
+        int curr_idx = 0;
+
+        int ans = 0;
+
+        for(char c: s){
+            int idx = c -'0';
+
+            Node& curr = nodes[curr_idx];
+
+            dbg(idx, curr_idx, curr.child[idx]);
+
+            if(curr.child[idx] == -1){
+                curr_idx = nodes.size();
+
+                curr.child[idx] = curr_idx;
+
+                nodes.emplace_back(false, false);
+
+                ans++;
+            }
+            else{
+                curr_idx = curr.child[idx];
+            }
+        }
+
+        assert(curr_idx != -1);
+
+        nodes[curr_idx].isEnd = true;
+
+        return ans;
+    }
+};
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, k; cin >> n >> k;
+
+    Trie trie;
+
+    int ans = k;
+
+    for(int i=0;i<n;i++){
+        string s; cin >> s;
+
+        int val = trie.add(s);
+
+        dbg(val);
+
+        ans = min(ans, val);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

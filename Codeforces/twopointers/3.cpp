@@ -27,7 +27,47 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m;
+
+    cin >> n >> m;
+
+    vector<int> a(n), b(m);
+
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+    }
+
+    for(int i=0;i<m;i++){
+        cin >> b[i];
+    }
+
+    int ans = 0;
+
+    int i =0, j =0;
+
+    while(j<m){
+        while(i<n && a[i]<b[j]){
+            i++;
+        }
+
+        //now it can be equal
+        int cnt_a = 0;
+        while(i<n && (a[i] == b[j])){
+            cnt_a ++; i++;
+        }
+
+        int val = b[j], cnt_b = 0; 
+
+        //now do same for j
+        while(j<m && b[j] == val){
+            cnt_b++;
+            j++;
+        }
+
+        ans += (cnt_a*cnt_b);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

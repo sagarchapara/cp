@@ -26,8 +26,89 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+
+int num_ballons(int time, int t, int z, int y){
+    int l = 0;
+    int r = 15000;
+
+    while(r-l>1){
+        int mid = (l+r+1)/2;
+
+        int val = mid*(z*t) + (mid)*y;
+
+        if(val > time){
+            r = mid-1;
+        }
+        else{
+            l = mid;
+        }
+    }
+
+    for(int i=r;i>=l;i--){
+        int val = i*(z*t) + (i)*y;
+
+        if(val <= time){
+            int ans = i*z;
+            ans += min(z, (time-val)/t);
+
+            return ans;
+        }
+    }
+
+    return 0;
+}
+
+bool check(int time, int m, int n, vector<int>& t, vector<int>& z, vector<int>& y){
+    int sum = 0;
+
+    for(int i=0;i<n;i++){
+        sum += num_ballons(time, t[i], z[i], y[i]);
+
+        if(sum >= m) return true;
+    }
+
+    return false;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, m; cin >> m >> n;
+
+    vector<int> t(n), z(n), y(n);
+
+    for(int i=0;i<n;i++){
+        cin >> t[i] >> z[i] >> y[i];
+    }
+
+    int l = 0;
+    int r = 1e18;
+
+    while (r-l>1)
+    {
+        int mid = (l+r+1)/2;
+
+        if(check(mid, m, n, t, z, y)){
+            r = mid;
+        }
+        else{
+            l = mid+1;
+        }
+    }
+
+    for(int i=l;i<=r;i++){
+        if(check(i,m,n,t,z,y)){
+            cout << i << endl;
+
+            for(int j=0;j<n;j++){
+                int num = num_ballons(i,t[j],z[j],y[j]);
+
+                cout << num << " ";
+            }
+
+            cout << endl;
+
+            return;
+        }
+    }
 }
 
 int32_t main() {

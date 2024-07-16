@@ -15,6 +15,7 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #endif
 
 #define int long long
+#define double long double
 #define pi pair<int,int>
 #define vi vector<int>
 #define vvi vector<vi>
@@ -26,8 +27,38 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+
+
+bool is_good(double x, double c){
+    double val = x*x;
+    val += sqrtl(x);
+
+    if(val > c){
+        return false;
+    }
+
+    return true;
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    double c;
+    cin >> c;
+
+    double l = 0;
+    double r = 1e5;
+
+    for(int i=0;i<100;i++){
+        double mid = (l+r)/(double)2.0;
+
+        if(is_good(mid, c)){
+            l = mid;
+        }
+        else{
+            r = mid;
+        }
+    }
+
+    cout << fixed << setprecision(7) << l <<endl;
 }
 
 int32_t main() {

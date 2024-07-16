@@ -26,8 +26,62 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+void dfs(int u, int p, int curr_color, vector<vector<int>>& adjL, vector<int>& color){
+    dbg(u);
+
+    color[u] = curr_color;
+
+    for(int v: adjL[u]){
+        if(v!=p){
+            dfs(v,u,1-curr_color, adjL, color);
+        }
+    }
+}
+
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+
+    vector<int> arr(n);
+
+    for(int i=0;i<n;i++){
+        cin >> arr[i];
+    }
+
+    vector<vector<int>> adjL(n, vector<int>());
+
+    for(int i=0;i<(n-1);i++){
+        int u,v ; cin >> u >> v; u--, v--;
+
+        adjL[u].push_back(v);
+        adjL[v].push_back(u);
+    }
+
+    dbg(adjL);
+
+    vector<int> color(n, -1);
+
+    dfs(0, -1, 0, adjL, color);
+
+    dbg(color);
+
+    int zero = 0, one = 0, sum =0;
+
+    for(int i=0;i<n;i++){
+        sum+= arr[i];
+
+        if(color[i] == 0){
+            one += arr[i];
+        }
+        else{
+            zero += arr[i];
+        }
+    }
+
+    int ans = sum + min(one, zero);
+
+    dbg(sum, one, zero);
+
+    cout << ans << endl;
 }
 
 int32_t main() {
@@ -42,7 +96,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

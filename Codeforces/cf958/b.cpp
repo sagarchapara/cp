@@ -27,7 +27,38 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n; cin >> n;
+    string s;
+
+    cin >> s;
+
+    string ns;
+
+    ns += s[0];
+
+    char prev = s[0];
+
+    int n_ones = s[0] == '0' ? 0 : 1;
+
+    for(int i=1;i<n;i++){
+        if(s[i-1] == s[i] && s[i] == '0'){
+            continue;
+        }
+        else if(s[i] == '1'){
+            ns += '1';
+            n_ones++;
+        }
+        else if(s[i-1] != s[i] && s[i] == '0'){
+            ns +='0';
+        }
+    }
+
+    if(n_ones > (ns.length() - n_ones)){
+        cout << "Yes" << endl;
+    }
+    else{
+        cout << "No" << endl;
+    }
 }
 
 int32_t main() {
@@ -42,7 +73,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

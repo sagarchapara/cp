@@ -27,7 +27,46 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define sz(x) (int)(x).size()
 
 void solve() {
-    int n, m; cin >> n >> m;
+    int n, c;
+    cin >> n >> c;
+
+    string s; cin >> s;
+
+    int ans =0;
+
+    int cnt_a =0, cnt_b =0;
+    int curr =0;
+
+    int l =0;
+
+    for(int r=0;r<n;r++){
+        if(s[r] == 'b'){
+            curr += cnt_a;
+            cnt_b++;
+        }
+        else if(s[r] == 'a'){
+            cnt_a++;
+        }
+
+        while (l<r && curr > c)
+        {
+            if(s[l] == 'a'){
+                curr -= cnt_b;
+                cnt_a--;
+            }
+            else if(s[l] == 'b'){
+                cnt_b--;
+            }
+            l++;
+        }
+
+        if((r-l)>=1 && (curr <=c) && curr != 0){
+            dbg(l,r, ans, curr);
+            ans = max(ans, r-l+1);
+        }
+    }
+    
+    cout << ans << endl;
 }
 
 int32_t main() {

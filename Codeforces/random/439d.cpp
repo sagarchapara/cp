@@ -26,8 +26,80 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
+int check(int k, vector<int>& a, vector<int>& b){
+    //a should be mininzed and b should be maximized
+
+    int ans = 0;
+    for(int i: a){
+        ans += max(0ll, k-i);
+    }
+
+    for(int i: b){
+        ans += max(0ll,i-k);
+    }
+
+    return ans;
+}
+
 void solve() {
     int n, m; cin >> n >> m;
+    vector<int> a(n), b(m);
+
+    int min_val = 1e9+5;
+    int max_val = 0;
+
+    for(int i=0;i<n;i++){
+        cin >> a[i];
+        min_val = min(a[i], min_val);
+        max_val = max(a[i], max_val);
+    }
+    
+    for(int i=0;i<m;i++){
+        cin >> b[i];
+        min_val = min(b[i], min_val);
+        max_val = max(b[i], max_val);
+    }
+
+    int l = min_val, r = max_val;
+
+    dbg(a, b);
+
+    dbg(l,r);
+
+    while (r-l>2)
+    {
+        int l1 = l + ((r-l)/3);
+        int l2 = r - ((r-l)/3);
+
+        int val1 = check(l1, a, b);
+        int val2 = check(l2, a, b);
+
+        if(val1 == val2){
+            l = l1;
+            r = l2;
+        }
+        else if(val1 < val2){
+            r = l2;
+        }
+        else{
+            l = l1;
+        }
+
+        dbg(l,r,l1,val1,l2, val2);
+    }
+
+    int ans;
+
+    for(int i=l;i<=r;i++){
+        if(i == l){
+            ans = check(i, a, b);
+        }
+        else{
+            ans = min(ans, check(i,a,b));
+        }
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {
