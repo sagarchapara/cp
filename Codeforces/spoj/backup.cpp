@@ -26,66 +26,100 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+struct Edge{
+    int val;
+    int l;
+    int r;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
+    Edge(int _val, int _l, int _r): val(_val), l(_l), r(_r){} 
+
+    bool operator<(const Edge& other) const {
+        if (val != other.val) return val < other.val;
+        if (l != other.l) return l < other.l;
+        return r < other.r;
     }
-}
+
+    bool operator==(const Edge& other) const {
+        return l == other.l && r == other.r && val == other.val;
+    }
+
+    friend ostream& operator<<(ostream& out, const Edge& curr){
+        out << curr.l << " " << curr.r << " " << curr.val; 
+
+        return out; 
+    }
+};
+
 
 void solve() {
-    int n, h, w;
-
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
+    int n, k; cin >> n >> k;
 
     vector<int> arr(n);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
+        cin >> arr[i];
     }
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
+    dbg(arr);
 
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
+    //let's keep all the k less edges;
+    set<Edge> edges1, edges2; int sum1 = 0, sum2 = 0, ans = -1;
 
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
+    for(int i=1;i<n;i++){
+        //we are worrying about (i-1, i);
+        Edge e(arr[i]-arr[i-1], i-1, i);
 
-                        return;
-                    }            
+        edges2.insert(e);
 
+        sum2 += e.val;
+
+        if(i-2>=0){
+            Edge prev_edge(arr[i-1]-arr[i-2], i-2, i-1);
+
+            if(edges1.find(prev_edge) == edges1.end()){
+                dbg("edge_not_found");
+
+                int val = sum1 + e.val;
+
+                if(edges1.size() == k){
+                    val -= edges1.rbegin()->val;
+                }
+
+                if(edges1.size() == k || edges1.size() == k-1){
+                    if(ans == -1){
+                        ans = val;
+                    }
+                    else{
+                        ans = min(ans, val);
+                    }
                 }
             }
         }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+        while (edges2.size() > k)
+        {
+            sum2 -= edges2.rbegin()->val;
+            edges2.erase(prev(edges2.end()));
+        }
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+        if(edges2.size() == k){
+            if(ans == -1){
+                ans = sum2;
+            }
+            else{
+                ans = min(ans, sum2);
+            }
+        }
+
+        swap(edges1, edges2);
+        swap(sum1, sum2);
+
+        dbg(edges1);
+        dbg(edges2);
+        dbg(sum1, sum2, ans);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {
@@ -100,7 +134,7 @@ int32_t main() {
     auto start = chrono::duration_cast<chrono::milliseconds>(chrono::system_clock::now().time_since_epoch()).count();
 
     int tc = 1;
-    // cin >> tc;
+    cin >> tc;
     for (int t = 1; t <= tc; t++) {
         solve();
     }

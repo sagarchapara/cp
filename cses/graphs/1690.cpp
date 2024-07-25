@@ -26,66 +26,36 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
-
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
-    }
-}
+const int MOD = 1e9+7;
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n), radjL(n);
 
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=0;i<m;i++){
+        int u, v; cin >> u >> v; u--, v--;
+        adjL[u].push_back(v);
+        radjL[v].push_back(u);
     }
 
-    vector<int> arr(n);
+    vector<vector<int>> dp(1<<n, vector<int>(n,0));
 
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
+    dp[1][0] = 1;
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
+    for(int i=2;i<(1<<n);i++){
+        for(int j=0;j<n;j++){
+            if(i&(1<<j) > 0){
+                for(int u: adjL[j]){
+                    if((i&(1<<u)) == 0){
+                        dp[i^(1<<u)][u] = (dp[i^(1<<u)][u] + dp[i][j])%MOD;
+                    }
                 }
             }
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
-
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    cout << dp[(1<<n)-1][n-1] << endl;
 }
 
 int32_t main() {

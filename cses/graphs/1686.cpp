@@ -26,66 +26,117 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void dfs(int u, vector<vector<int>>& adjL, vector<bool>& visited, vector<int>& component){
+    visited[u] = true;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    for(int v: adjL[u]){
+        if(!visited[v]){
+            dfs(v, adjL, visited, component);
         }
     }
+
+    component.push_back(u);
+}
+
+int dfs2(int curr, vector<vector<int>>& adjL, vector<int>& dp, vector<int>& arr){
+    if(dp[curr] != -1){
+        return dp[curr];
+    }
+
+    int ans = 0;
+
+    for(int u: adjL[curr]){
+        ans = max(ans, dfs2(u, adjL, dp, arr));
+    }
+
+    return dp[curr] = ans + arr[curr];
 }
 
 void solve() {
-    int n, h, w;
-
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
+    int n, m; cin >> n >> m;
 
     vector<int> arr(n);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
+        cin >> arr[i];
     }
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
+    vector<vector<int>> adjL(n), radjL(n);
 
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
+    for(int i=0;i<m;i++){
+        int u, v; cin >> u >> v; u--, v--;
+        adjL[u].push_back(v);
+        radjL[v].push_back(u);
+    }
 
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
+    dbg(adjL, radjL);
 
-                        return;
-                    }            
+    vector<int> tpg;
+    vector<bool> visited(n, false);
 
-                }
+    for(int i=0;i<n;i++){
+        if(!visited[i]){
+            dfs(i, adjL, visited, tpg);
+        }
+    }
+
+    reverse(tpg.begin(), tpg.end());
+
+    visited.assign(n, false);
+
+    int num =0;
+    vector<int> values, cmap(n);
+
+    for(int i: tpg){
+        if(!visited[i]){
+            vector<int> component;
+            int val = 0;
+
+            dfs(i, radjL, visited, component);
+
+            for(int j: component){
+                cmap[j] = num;
+                val += arr[j];
+            }
+
+            dbg(component);
+
+            values.push_back(val);
+            num++;
+        }
+    }
+
+    assert(num == values.size());
+
+    //create new adj list
+    int new_n = values.size();
+
+    vector<vector<int>> nadjL(new_n);
+
+    dbg(cmap);
+
+    for(int i=0;i<n;i++){
+        for(int j: adjL[i]){
+            if(cmap[i] != cmap[j]){
+                nadjL[cmap[i]].push_back(cmap[j]);
             }
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    dbg(nadjL);
+    dbg(values);
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    int ans =0;
+    vector<int> dp(new_n, -1);
+
+    for(int i=0;i<new_n;i++){
+        if(dp[i] == -1){
+            dfs2(i,nadjL,dp,values);
+        }
+        ans = max(ans, dp[i]);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

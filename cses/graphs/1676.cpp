@@ -26,66 +26,58 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+class DSU{
+    int n;
+    vector<int> parent, size;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+public:
+    int n_components, max_component_size;
+
+    DSU(int _n): n(_n){
+        size.resize(n, 1);
+        parent.resize(n);
+        for(int i=0;i<n;i++){
+            parent[i] = i;
+        }
+        n_components = n;
+        max_component_size = 1;
+    }
+
+    int find_parent(int u){
+        if(u == parent[u]) return u;
+
+        return parent[u] = find_parent(parent[u]);
+    }
+
+    void merge(int u, int v){
+        u = find_parent(u);
+        v = find_parent(v);
+
+        if(u != v){
+            if(size[u] < size[v]){
+                swap(u,v);
+            }
+
+            parent[v] = u;
+            size[u]+=size[v];
+            max_component_size = max(max_component_size, size[u]);
+            n_components--;
         }
     }
-}
+};
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    DSU dsu(n);
 
-    vector<pair<int, int>> blocks;
+    for(int i=0;i<m;i++){
+        int u,v; cin >> u >> v; u--, v--;
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+        dsu.merge(u, v);
+
+        cout << dsu.n_components << " " << dsu.max_component_size << endl;
     }
-
-    vector<int> arr(n);
-
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
-        }
-
-    }while(next_permutation(arr.begin(), arr.end()));
-
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
 }
 
 int32_t main() {

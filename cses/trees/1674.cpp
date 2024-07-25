@@ -26,66 +26,40 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
-
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
+int dfs(int curr, vector<vector<int>>& adjL, vector<int>& dp){
+    if(dp[curr] != -1){
+        return dp[curr];
     }
+
+    int ans =0;
+
+    for(int next: adjL[curr]){
+        ans += (1 + dfs(next, adjL, dp));
+    }
+
+    return dp[curr] = ans;
 }
 
 void solve() {
-    int n, h, w;
+    int n; cin >> n;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n);
 
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=1;i<n;i++){
+        int p; cin >> p; p--;
+        adjL[p].push_back(i);
     }
 
-    vector<int> arr(n);
+    vector<int> dp(n, -1);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        if(dp[i] == -1){
+            dfs(i, adjL, dp);
         }
 
-    }while(next_permutation(arr.begin(), arr.end()));
-
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+        cout << dp[i] << " ";
+    }
+    cout << endl;
 }
 
 int32_t main() {

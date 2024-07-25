@@ -26,66 +26,65 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
-
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
-    }
-}
-
 void solve() {
-    int n, h, w;
-
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
+    int n, m; cin >> n >> m;
 
     vector<int> arr(n);
 
+    vector<pair<int, int>> intervals;
+
     for(int i=0;i<n;i++){
-        arr[i] = i;
+        cin >> arr[i];
     }
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
+    sort(arr.begin(), arr.end());
 
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
+    priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int,int>>> pq;
 
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
+    for(int i=0;i<m;i++){
+        int u,v; cin >> u >> v;
 
-                        return;
-                    }            
+        intervals.push_back({u-v, u+v});
+    }
 
-                }
-            }
+    sort(intervals.begin(), intervals.end());
+
+    dbg(intervals);
+
+    int start = 0, interval_start = 0;
+
+    int ans = 0;
+
+    while(start < n){
+        
+        while(interval_start < m && intervals[interval_start].first <= arr[start]){
+            pq.push({intervals[interval_start].second, intervals[interval_start].first});
+
+            dbg(intervals[interval_start]);
+            interval_start++;
         }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+        //remove all intervals less than arr[start]
+        while (!pq.empty() && (pq.top().first < arr[start]))
+        {
+            dbg(pq.top());
+            pq.pop();
+        }
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+
+
+        if(pq.empty()){
+            start++;
+            continue;
+        }
+
+        dbg(pq.top(), start);
+
+        pq.pop(); ans ++; start++;
+    }
+
+    cout << ans << endl;
+
 }
 
 int32_t main() {

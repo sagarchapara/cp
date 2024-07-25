@@ -26,66 +26,69 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+const int MOD = 1e9+7;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+vector<vector<int>> matrix_mul(vector<vector<int>>& a, vector<vector<int>>& b){
+    assert(a[0].size() == b.size());
+    vector<vector<int>> ab(a.size(), vector<int>(b[0].size(),0));
+
+    for(int i=0;i<a.size();i++){
+        for(int j=0;j<b[0].size();j++){
+            for(int k=0;k<a[0].size();k++){
+                ab[i][j] = (ab[i][j] + a[i][k]*b[k][j])%MOD;
+            }
         }
     }
+
+    return ab;
+}
+
+vector<vector<int>> matrix_pow_k(vector<vector<int>>& arr, int k){
+    int n = arr.size();
+    vector<vector<int>> ans(n, vector<int>(n, 0));
+    
+    // Initialize ans as the identity matrix
+    for (int i = 0; i < n; i++) {
+        ans[i][i] = 1;
+    }
+
+    auto val = arr;
+
+    while(k > 0){
+        if(k & 1){
+            dbg(k);
+            ans = matrix_mul(ans, val);
+        }
+
+        val = matrix_mul(val, val);
+        k>>=1;
+    }
+
+    return ans;
 }
 
 void solve() {
-    int n, h, w;
+    int n, k; cin >> n >> k;
 
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
+    vector<vector<int>> arr(n, vector<int>(n));
 
     for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
-
-    vector<int> arr(n);
-
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        for(int j=0;j<n;j++){
+            cin >> arr[i][j];
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    int ans = 0;
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    auto val = matrix_pow_k(arr, k);
+
+    for(int i=0;i<n;i++){
+        for(int j=0;j<n;j++){
+            ans = (ans + val[i][j])%MOD;
+        }
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

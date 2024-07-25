@@ -26,66 +26,64 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void dfs(int curr, vector<vector<int>>& adjL, vector<int>& path){
+    while(!adjL[curr].empty()){
+        auto next = adjL[curr].back();
+        adjL[curr].pop_back();
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
+        dfs(next, adjL, path);
     }
+
+    path.push_back(curr);
 }
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n);
 
-    vector<pair<int, int>> blocks;
+    vector<int> out(n,0), in(n,0);
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=0;i<m;i++){
+        int a, b; cin >> a >> b; a--, b--;
+        out[a]++;
+        in[b]++;
+        adjL[a].push_back(b);
     }
 
-    vector<int> arr(n);
+    bool flag = true;
 
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+    for(int i=1;i<(n-1);i++){
+        if(out[i] != in[i]){
+            flag = false;
+            break;
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    if(out[0] != (in[0]+1) || (out[n-1] != (in[n-1]-1)) || !flag){
+        cout << "IMPOSSIBLE" << endl;
+        return;
+    }
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    vector<int> path;
+
+    dfs(0, adjL, path);
+
+    dbg(path);
+
+    reverse(path.begin(), path.end());
+
+    if(path.size() != (m+1) || path.back() != n-1){
+        cout << "IMPOSSIBLE" << endl;
+        return;
+    }
+
+    for(int i: path){
+        cout << (i+1) << " ";
+    }
+
+    cout << endl;
+
 }
 
 int32_t main() {

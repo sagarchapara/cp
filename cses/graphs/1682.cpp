@@ -26,66 +26,75 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void dfs(int curr, vector<vector<int>>& adjL, vector<bool>& visited, vector<int>& tpg){
+    visited[curr] = true;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    for(int v: adjL[curr]){
+        if(!visited[v]){
+            dfs(v, adjL, visited, tpg);
         }
     }
+
+    tpg.push_back(curr);
 }
 
+
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n), radjL(n);
 
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=0;i<m;i++){
+        int u, v ; cin >> u >> v; u--,v--;
+        adjL[u].push_back(v);
+        radjL[v].push_back(u);
     }
 
-    vector<int> arr(n);
+    vector<bool> visited(n, false);
+    vector<int> tpg;
 
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
+    dfs(0, adjL, visited, tpg);
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
+    if(tpg.size() != n){
+        cout << "NO" << endl;
+        int i;
+        for(i=0;i<n;i++){
+            if(!visited[i]){
+                break;
             }
         }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+        cout << 1 << " " << (i+1) << endl;
+        return;
+    }
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    dbg(tpg);
+
+    visited.assign(n, false);
+
+    reverse(tpg.begin(), tpg.end());
+
+    vector<int> component;
+    
+    dfs(tpg[0], radjL, visited, component);
+
+    dbg(component);
+
+    if(component.size() == n){
+        cout << "YES" << endl;
+    }
+    else{
+        //find first visited false
+        int i;
+        for(i=0;i<n;i++){
+            if(!visited[i]){
+                break;
+            }
+        }
+
+        cout << "NO" << endl;
+        cout << (i+1)  << " " << (tpg[0]+1) << endl;
+    }
 }
 
 int32_t main() {

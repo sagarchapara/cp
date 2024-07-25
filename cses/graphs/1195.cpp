@@ -26,66 +26,79 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+vector<int> dijistra(int x, vector<vector<pair<int, int>>>& adjL){
+    int n = adjL.size();
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    vector<int> d(n, -1);
+
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
+
+    pq.push({0, x});
+
+    while (!pq.empty())
+    {
+        auto p = pq.top(); pq.pop();
+
+        if(d[p.second] != -1){
+            continue;
         }
-    }
-}
 
-void solve() {
-    int n, h, w;
+        d[p.second] = p.first;
 
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
-
-    vector<int> arr(n);
-
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
+        for(auto np: adjL[p.second]){
+            if(d[np.first] == -1){
+                pq.push({p.first + np.second, np.first});
             }
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    return d;
+}
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+struct Edge{
+    int l;
+    int r;
+    int cost;
+
+    Edge(int _l, int _r, int _cost): l(_l), r(_r), cost(_cost){}
+};
+
+void solve() {
+    int n, m; cin >> n >> m;
+
+    vector<vector<pair<int,int>>> adjL(n), radjL(n);
+
+    vector<Edge> edges;
+
+    for(int i=0;i<m;i++){
+        int a,b,c; cin >> a >> b >> c; a--, b--;
+
+        adjL[a].push_back({b,c});
+
+        radjL[b].push_back({a,c});
+
+        edges.emplace_back(a,b,c);
+    }
+
+    vector<int> front = dijistra(0, adjL);
+    vector<int> back = dijistra(n-1, radjL);
+
+    //dbg(front);
+    //dbg(back);
+
+    int ans = front[n-1];
+
+    for(Edge& e : edges){
+        if(front[e.l] == -1 || back[e.r] == -1){
+            continue;
+        }
+
+        int val = (long long)(e.cost/2) + front[e.l] + back[e.r];
+
+        ans = min(ans, val);
+    }
+
+    cout << ans << endl;
 }
 
 int32_t main() {

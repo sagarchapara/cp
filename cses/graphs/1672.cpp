@@ -26,66 +26,53 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void solve() {
+    int n, m, q; cin >> n >> m >> q;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    int dp[n][n];
+
+    memset(dp, -1, sizeof(dp));
+
+    for(int i=0;i<n;i++){
+        dp[i][i] = 0;
+    }
+
+    for(int i=0;i<m;i++){
+        int a,b,c; cin >> a >> b >> c;
+        a--, b--;
+
+        if(dp[a][b] == -1){
+            dp[a][b] = c;
+            dp[b][a] = c;
+        }
+        else{
+            dp[a][b] = min(c, dp[a][b]);
+            dp[b][a] = min(c, dp[b][a]);
         }
     }
-}
 
-void solve() {
-    int n, h, w;
-
-    cin >> n >> h >> w;
-
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
-    }
-
-    vector<int> arr(n);
-
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
+    for(int k = 0;k<n;k++){
+        for(int i=0;i<n;i++){
+            for(int j =0;j<n;j++){
+                if(i !=j && j!=k){
+                    if(dp[i][k] != -1 && dp[k][j] != -1){
+                        if(dp[i][j] == -1){
+                            dp[i][j] = dp[i][k] + dp[k][j];
                         }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
+                        else{
+                            dp[i][j] = min(dp[i][j], dp[i][k] + dp[k][j]);
+                        }
+                    }
                 }
             }
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    while(q--){
+        int a, b; cin >> a >> b; a--, b--;
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+        cout << dp[a][b] << endl;
+    }
 }
 
 int32_t main() {

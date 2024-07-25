@@ -26,66 +26,59 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void dfs(int curr, vector<bool>& visited, vector<vector<pair<int,int>>>& adjL, vector<int>& path){
+    while (!adjL[curr].empty())
+    {
+        auto [next, edge]= adjL[curr].back();
+        adjL[curr].pop_back();
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
+        if(visited[edge]) continue;
+        visited[edge] = true;
+
+        dfs(next, visited, adjL, path);
     }
+
+    path.push_back(curr);
 }
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<pair<int,int>>> adjL(n);
 
-    vector<pair<int, int>> blocks;
+    vector<int> d(n, 0);
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=0;i<m;i++){
+        int u,v; cin >> u >> v; u--, v--;
+        d[u]++;
+        d[v]++;
+
+        adjL[u].push_back({v, i});
+        adjL[v].push_back({u,i});
     }
 
-    vector<int> arr(n);
-
     for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        if(d[i]%2 != 0){
+            cout << "IMPOSSIBLE" << endl;
+            return;
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    vector<bool> visited(m, false);
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    vector<int> path;
+
+    dfs(0, visited, adjL, path);
+
+    if(path.size() != m +1){
+        cout << "IMPOSSIBLE";
+    }
+    else{
+        for(auto i: path){
+            cout << (i+1) << " ";
+        }
+    }
+    cout << endl;
 }
 
 int32_t main() {

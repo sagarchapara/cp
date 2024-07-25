@@ -26,66 +26,54 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+bool dfs(int curr, vector<vector<int>>& adjL, vector<int>& color, vector<int>& ans){
+    color[curr] = 1;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    for(int u: adjL[curr]){
+        if(color[u] == 0){
+            if(dfs(u, adjL, color, ans)){
+                return true;
+            }
+        }
+        else if(color[u] == 1){
+            return true; //cycle
         }
     }
+
+    color[curr] = 2;
+    ans.push_back(curr);
+
+    return false;
 }
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n);
 
-    vector<pair<int, int>> blocks;
+    for(int i=0;i<m;i++){
+        int a,b; cin >> a >> b; a--, b--;
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+        adjL[a].push_back(b);
     }
 
-    vector<int> arr(n);
+    vector<int> ans;
+    vector<int> color(n);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        if(color[i]==0 && dfs(i, adjL, color, ans)){
+            cout << "IMPOSSIBLE" << endl;
+            return;
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    reverse(ans.begin(), ans.end());
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    for(int i: ans){
+        cout << (i+1) << " ";
+    }
+
+    cout << endl;
 }
 
 int32_t main() {

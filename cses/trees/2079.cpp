@@ -26,66 +26,67 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void dfs(int curr, int par, int par_size, vector<vector<int>>& adjL, vector<int>& sz, vector<bool>& centroid){
+    bool isCentroid = par_size <= sz.size()/2;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
+    int sub_array_size = sz[curr];
+
+    for(int u: adjL[curr]){
+        if(u == par) continue;
+
+        isCentroid &= (sz[u] <= sz.size()/2);
+
+        int val = par_size + sub_array_size - sz[u];
+
+        dfs(u, curr, val, adjL, sz, centroid);
     }
+
+    centroid[curr] = isCentroid;
+}
+
+int compute_size(int curr, int par, vector<vector<int>>& adjL, vector<int>& sz){
+    int ans = 1;
+
+    for(int u: adjL[curr]){
+        if(u!=par){
+            ans += compute_size(u, curr, adjL, sz);
+        }
+    }    
+
+    return sz[curr] = ans;
 }
 
 void solve() {
-    int n, h, w;
+    int n; cin >> n;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n);
 
-    vector<pair<int, int>> blocks;
-
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=1;i<n;i++){
+        int u,v; cin >> u >> v; u--, v--;
+        adjL[u].push_back(v);
+        adjL[v].push_back(u);
     }
 
-    vector<int> arr(n);
+    vector<int> size(n);
+
+    compute_size(0, -1, adjL, size);
+
+    dbg(size);
+
+    vector<bool> is_centroid(n, false);
+
+    dfs(0, -1, 0, adjL, size, is_centroid);
+
+    dbg(is_centroid);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        if(is_centroid[i]){
+            cout << (i+1) << endl;
+            return;
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
-
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    cout << "IMPOSSIBLE" << endl;
 }
 
 int32_t main() {

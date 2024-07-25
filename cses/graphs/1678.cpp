@@ -26,66 +26,75 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+void print_cycle(int start, int end, vector<int> par){
+    vector<int> ans;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+    ans.push_back(end);
+
+    while(start != end){
+        dbg(start, par[start], end);
+
+        ans.push_back(start);
+        start = par[start];    
+    }
+
+    ans.push_back(end);
+
+    reverse(ans.begin(), ans.end());
+
+    cout << ans.size() << endl;
+
+    for(int u: ans){
+        cout << u+1 << " ";
+    }
+
+    cout << endl;
+}
+
+bool dfs(int u, int par, vector<vector<int>>& adjL, vector<int>& color, vector<int>& parent){
+    color[u] = 1;
+    parent[u] = par;
+
+    for(int v: adjL[u]){
+        if(color[v] == 0){
+            if(dfs(v,u,adjL,color,parent)){
+                return true;
+            }
+        }
+        else if(color[v] == 1){
+            //has a cycle
+            print_cycle(u, v, parent);
+            return true;
         }
     }
+
+    color[u] = 2;
+
+    return false;
 }
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<vector<int>> adjL(n);
 
-    vector<pair<int, int>> blocks;
+    for(int i=0;i<m;i++){
+        int u,v; cin >> u >>v; u--,v--;
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+        adjL[u].push_back(v);
     }
 
-    vector<int> arr(n);
+    vector<int> color(n, 0);
+
+    vector<int> parent(n, -1);
 
     for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
-
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
-
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+        if(color[i] == 0 && dfs(i,-1,adjL, color, parent)){
+            return;
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
-
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    cout << "IMPOSSIBLE" << endl;
 }
 
 int32_t main() {

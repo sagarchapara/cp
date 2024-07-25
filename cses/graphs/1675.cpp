@@ -26,66 +26,103 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
+class DSU{
+    vector<int> parent, rank;
+    int n;
 
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
+public:
+    DSU(int _n): n(_n){
+        rank.assign(n, 0);
+        parent.resize(n);
+
+        for(int i=0;i<n;i++){
+            parent[i] =i;
         }
     }
-}
+
+    int find_parent(int i){
+        if(parent[i] == i){
+            return i;
+        }
+
+        return parent[i] = find_parent(parent[i]);
+    }
+
+    void merge(int i, int j){
+        i = find_parent(i);
+        j = find_parent(j);
+
+        if(i == j){
+            return;
+        }
+
+        if(rank[i] < rank[j]){
+            swap(i,j);
+        }
+
+        parent[j] = i;
+
+        if(rank[i] == rank[j]){
+            rank[i]++;
+        }
+    }
+
+    bool check(int i, int j){
+        return find_parent(i) == find_parent(j);
+    }
+};
+
+struct Edge{
+    int u;
+    int v;
+    int cost;
+
+    Edge(int _u, int _v, int _cost): u(_u), v(_v), cost(_cost){}
+
+    bool operator<(const Edge& other) const {
+        return cost < other.cost;
+    }
+};
 
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<Edge> edges;
 
-    vector<pair<int, int>> blocks;
+    for(int i=0;i<m;i++){
+        int u,v,w; cin >> u >> v >> w; u--, v--;
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+        edges.emplace_back(u,v,w);
     }
 
-    vector<int> arr(n);
+    sort(edges.begin(), edges.end());
 
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
+    DSU dsu(n);
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
+    int cost = 0;
 
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
-
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
-
-                        return;
-                    }            
-
-                }
-            }
+    for(Edge e: edges){
+        if(!dsu.check(e.u, e.v)){
+            cost += e.cost;
+            dsu.merge(e.u, e.v);
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    bool good = true;
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    for(int i=0;i<(n-1);i++){
+        if(!dsu.check(i, i+1)){
+            good = false;
+            break;
+        }
+    }
+
+    if(good){
+        cout << cost << endl;
+    }
+    else{
+        cout << "IMPOSSIBLE" << endl;
+    }
 }
 
 int32_t main() {

@@ -26,66 +26,48 @@ template<typename Head, typename... Tail> void dbg_out(Head H, Tail... T) { cerr
 #define Unique(store) store.resize(unique(store.begin(),store.end())-store.begin())
 #define sz(x) (int)(x).size()
 
-bool is_filled(vector<vector<bool>>& filled){
-    int h = filled.size();
-    int w = filled[0].size();
-
-    //check if all blocks are filled
-    for(int i=0;i<h;i++){
-        for(int j=0;j<w;j++){
-            if(!filled[i][j]) return false;
-        }
-    }
-}
-
 void solve() {
-    int n, h, w;
+    int n, m; cin >> n >> m;
 
-    cin >> n >> h >> w;
+    vector<int> dist(n, -1);
 
-    vector<pair<int, int>> blocks;
+    vector<vector<pair<int,int>>> adjL(n);
 
-    for(int i=0;i<n;i++){
-        int x,y;
-        cin >> x >> y;
-        blocks.push_back({x,y});
+    for(int i=0;i<m;i++){
+        int a,b,c; cin >> a >> b >> c;
+        a--; b--;
+
+        adjL[a].push_back({b,c});
     }
 
-    vector<int> arr(n);
+    priority_queue<pair<int,int>, vector<pair<int,int>>, greater<pair<int,int>>> pq;
 
-    for(int i=0;i<n;i++){
-        arr[i] = i;
-    }
+    pq.push({0,0});
 
-    do{
-        for(int mask=0; mask < (1<<n);mask++){
-            vector<vector<bool>> filled(h, vector<bool>(w, false));
+    while (!pq.empty())
+    {
+        auto p = pq.top(); pq.pop();
 
-            for(int i: arr){
-                if(mask & (1<<i)){
-                    //we need to put first empty block here
-                    int x = -1, y = -1;
-                    for(int xx =0;xx<h;xx++){
-                        for(int yy=0;yy<w;yy++){
-                            if(!filled[xx][yy]){
-                                x = xx; y = yy;
-                            }
-                        }
-                    }    
+        if(dist[p.second] != -1){
+            continue;
+        }
 
-                    if(x == -1 && y == -1){
-                        cout << "YES" << endl;
+        //update
+        dist[p.second] = p.first;
 
-                        return;
-                    }            
-
-                }
+        for(auto& np : adjL[p.second]){
+            if(dist[np.first] == -1){
+                pq.push({p.first + np.second, np.first});
             }
         }
+    }
 
-    }while(next_permutation(arr.begin(), arr.end()));
+    for(int i=0;i<n;i++){
+        cout << dist[i] << " ";
+    }
 
-    vector<vector<bool>> filled(h, vector<bool>(w,false));
+    cout << endl;
+    
 }
 
 int32_t main() {
